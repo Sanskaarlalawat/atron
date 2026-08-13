@@ -1,0 +1,1944 @@
+/* ATCON — base styles
+   Palette, layout primitives and components shared by every page. */
+
+:root {
+  --navy: #0a1733;
+  --navy-soft: #13254c;
+  --blue: #2563eb;
+  --blue-dark: #1d4ed8;
+  --blue-tint: #e8efff;
+  --ink: #0f172a;
+  --muted: #5b6b84;
+  --line: #e3e8f0;
+  --bg: #ffffff;
+  --bg-alt: #f6f8fc;
+  --radius: 14px;
+  --radius-lg: 22px;
+  --shadow: 0 1px 2px rgba(15, 23, 42, .04), 0 12px 32px rgba(15, 23, 42, .06);
+  --shadow-lg: 0 24px 60px rgba(10, 23, 51, .12);
+  --max: 1160px;
+  --font: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  font-family: var(--font);
+  color: var(--ink);
+  background: var(--bg);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+img { max-width: 100%; display: block; }
+
+a { color: inherit; text-decoration: none; }
+
+h1, h2, h3, h4 {
+  margin: 0 0 .5em;
+  line-height: 1.15;
+  letter-spacing: -.02em;
+  font-weight: 700;
+}
+
+h1 { font-size: clamp(2.2rem, 5vw, 3.5rem); }
+h2 { font-size: clamp(1.8rem, 3.4vw, 2.6rem); }
+h3 { font-size: 1.2rem; }
+
+p { margin: 0 0 1rem; }
+
+.container {
+  width: 100%;
+  max-width: var(--max);
+  margin-inline: auto;
+  padding-inline: 24px;
+}
+
+.section { padding: 88px 0; }
+/* keep anchor targets clear of the sticky header */
+.section[id] { scroll-margin-top: 90px; }
+.section--alt { background: var(--bg-alt); }
+.section--dark { background: var(--navy); color: #fff; }
+.section--dark p { color: #b7c4dc; }
+
+.eyebrow {
+  display: inline-block;
+  font-size: .78rem;
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--blue);
+  margin-bottom: 14px;
+}
+.section--dark .eyebrow { color: #7ea6ff; }
+
+.lead { font-size: 1.08rem; color: var(--muted); max-width: 62ch; }
+.section--dark .lead { color: #b7c4dc; }
+
+.section-head { max-width: 720px; margin-bottom: 48px; }
+.section-head.center { margin-inline: auto; text-align: center; }
+
+/* ---------- buttons ---------- */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 13px 24px;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: .95rem;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: transform .15s ease, background .15s ease, border-color .15s ease,
+    color .15s ease;
+}
+.btn:hover { transform: translateY(-1px); }
+.btn--primary { background: var(--blue); color: #fff; }
+.btn--primary:hover { background: var(--blue-dark); }
+.btn--ghost { border-color: var(--line); background: #fff; color: var(--ink); }
+.btn--ghost:hover { border-color: var(--blue); color: var(--blue); }
+.btn--light { background: #fff; color: var(--navy); }
+.btn--outline-light { border-color: rgba(255, 255, 255, .35); color: #fff; }
+.btn--outline-light:hover { border-color: #fff; }
+
+.link-arrow {
+  font-weight: 600;
+  color: var(--blue);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.link-arrow::after { content: "→"; transition: transform .15s ease; }
+.link-arrow:hover::after { transform: translateX(3px); }
+
+/* ---------- header ---------- */
+
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  /* tinted to the hero background so the header reads as part of it */
+  background: rgba(248, 248, 250, .88);
+  backdrop-filter: saturate(180%) blur(12px);
+  border-bottom: 1px solid var(--line);
+}
+.site-header .container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 74px;
+}
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 800;
+  font-size: 1.25rem;
+  letter-spacing: .06em;
+}
+.logo-mark {
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  background: linear-gradient(135deg, var(--blue), #7c3aed);
+}
+.nav { display: flex; align-items: center; gap: 34px; }
+.nav a {
+  font-size: .93rem;
+  font-weight: 600;
+  color: var(--muted);
+  letter-spacing: .02em;
+}
+.nav a:hover, .nav a[aria-current="page"] { color: var(--ink); }
+/* the CTA is an <a> too — keep it on the button colours, not the nav link colours */
+.nav a.btn--primary, .nav a.btn--primary:hover { color: #fff; }
+.nav-toggle {
+  display: none;
+  background: none;
+  border: 0;
+  font-size: 1.6rem;
+  line-height: 1;
+  cursor: pointer;
+  color: var(--ink);
+}
+
+/* ---------- hero ---------- */
+
+/* The clip is a full-bleed layer filling the section: it runs to the top,
+   right and bottom edges with no frame, and the copy sits over it on the left.
+   --hero-bg is sampled from the clip's own background so the two are seamless. */
+.hero {
+  --hero-bg: #f8f8fa;
+  /* how far right the clip sits, in px. 0 = flush left. Raise it to push the
+     machine further off the copy; the strip it leaves on the left is filled
+     by --hero-bg, which is the clip's own background colour, so it's invisible. */
+  --hero-shift: 64px;
+  position: relative;
+  overflow: hidden;
+  background: var(--hero-bg);
+  /* full page: the hero and the sticky header together fill the viewport, so
+     the logo strip below starts just off the fold */
+  min-height: max(560px, calc(100vh - 74px));
+  min-height: max(560px, calc(100svh - 74px));
+  display: flex;
+  /* the copy sits in the empty lower-left corner of the composition */
+  align-items: flex-end;
+  padding: 72px 0 88px;
+}
+
+/* Fills the whole section, edge to edge. */
+.hero-media {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+.hero-media video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* a length here is the offset of the clip's left edge from the section's
+     left edge, so --hero-shift moves the artwork right by exactly that many
+     pixels at every viewport width; `cover` takes the crop off the right */
+  object-position: var(--hero-shift) center;
+}
+/* Shifting the clip right leaves a hard vertical cut at its left edge. This
+   holds the background solid just past that seam, then dissolves the artwork
+   in over the next 220px so the edge reads as a fade rather than a crop. */
+.hero-media::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    var(--hero-bg) 0,
+    var(--hero-bg) calc(var(--hero-shift) + 10px),
+    rgba(248, 248, 250, 0) calc(var(--hero-shift) + 230px)
+  );
+}
+
+/* Off the page grid entirely and hard to the left, so the copy sits as deep
+   into the clear wedge of the artwork as it can without touching the edge. */
+.hero-inner {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: none;
+  padding-left: clamp(20px, 4vw, 48px);
+}
+/* kept narrow so the block stays inside the clear wedge at the lower left of
+   the frame rather than running into the conveyor and control panel */
+.hero-copy { max-width: 25rem; }
+.hero h1 { margin-bottom: 18px; font-size: clamp(2.2rem, 3.4vw, 3rem); }
+.hero .lead { font-size: 1.05rem; }
+.hero-actions { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 30px; }
+
+/* Stacked: copy first, then the clip full-bleed beneath it. Below ~1024px
+   there isn't enough clear space left of the artwork to overlay the headline. */
+@media (max-width: 1024px) {
+  .hero {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    padding: 64px 0 0;
+  }
+  /* the clip is first in the DOM so it can be the backdrop on desktop —
+     put it back below the copy once they stack */
+  .hero-inner { order: 1; }
+  .hero-media {
+    order: 2;
+    position: static;
+    width: 100%;
+    margin-top: 48px;
+  }
+  .hero-media video { height: auto; aspect-ratio: 16 / 9; object-position: center; }
+  /* stacked, the clip isn't shifted, so there's no seam to hide */
+  .hero-media::after { content: none; }
+  .hero-copy { max-width: none; }
+}
+
+/* ---------- logo strip ---------- */
+
+.logos {
+  padding: 44px 0;
+  border-block: 1px solid var(--line);
+  background: var(--bg-alt);
+}
+.logos p {
+  text-align: center;
+  color: var(--muted);
+  font-size: .85rem;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  font-weight: 600;
+  margin-bottom: 22px;
+}
+.logo-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 18px 46px;
+}
+.logo-row span {
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: #90a0ba;
+  letter-spacing: .04em;
+}
+
+/* ---------- generic card grids ---------- */
+
+.grid { display: grid; gap: 24px; }
+.grid-2 { grid-template-columns: repeat(2, 1fr); }
+.grid-3 { grid-template-columns: repeat(3, 1fr); }
+.grid-4 { grid-template-columns: repeat(4, 1fr); }
+
+.card {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 28px;
+  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow);
+  border-color: #cfdcf5;
+}
+.card h3 { margin-bottom: 8px; }
+.card p { color: var(--muted); margin: 0; font-size: .96rem; }
+
+.card-icon {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  background: var(--blue-tint);
+  color: var(--blue);
+  font-size: 1.2rem;
+  margin-bottom: 16px;
+}
+
+/* problem cards sit on the alt background */
+.card--plain { background: transparent; border-color: #dbe3f0; }
+
+/* ---------- positioning band ---------- */
+
+.band-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-top: 40px;
+}
+.band-item {
+  border: 1px solid rgba(255, 255, 255, .16);
+  border-radius: var(--radius);
+  padding: 24px;
+}
+.band-item.is-highlight {
+  background: linear-gradient(160deg, var(--blue), #4f46e5);
+  border-color: transparent;
+}
+.band-item h3 { color: #fff; }
+.band-item p { margin: 0; font-size: .95rem; }
+.band-item.is-highlight p { color: #dce6ff; }
+
+/* ---------- steps ---------- */
+
+.steps { counter-reset: step; }
+.step { position: relative; padding-top: 26px; }
+.step::before {
+  counter-increment: step;
+  content: "0" counter(step);
+  position: absolute;
+  top: -6px;
+  left: 0;
+  font-weight: 800;
+  font-size: .85rem;
+  color: var(--blue);
+  letter-spacing: .1em;
+}
+.step h3 { margin-bottom: 6px; }
+.step p { color: var(--muted); margin: 0; font-size: .96rem; }
+.step-line {
+  height: 2px;
+  background: var(--line);
+  margin: 18px 0;
+  position: relative;
+}
+.step-line::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: -3px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--blue);
+}
+
+/* ---------- stats ---------- */
+
+.stat { text-align: center; }
+.stat strong {
+  display: block;
+  font-size: clamp(2.2rem, 4.5vw, 3.1rem);
+  font-weight: 800;
+  letter-spacing: -.03em;
+  color: #fff;
+}
+.stat span { color: #9fb2d4; font-size: .95rem; }
+
+/* ---------- case studies: the stack ----------
+   Every slide is `position: sticky` at the same offset inside one container, so
+   slide 1 pins under the header and stays there while slides 2–6 scroll up and
+   cover it in turn. Each slide takes the position the previous one held rather
+   than pushing it away. Three things make it work: the slides are siblings in a
+   single container (a wrapper per slide would unpin each at its wrapper's edge),
+   they share the same `top`, and each has an opaque background — a transparent
+   slide would let the one underneath show through instead of replacing it. */
+
+.cs {
+  --cs-bg: #ffffff;
+  --cs-edge: #e7e7e9;
+  --cs-faint: #f2f2f4;
+  --cs-ui: #eceef1;
+  --cs-ui2: #f5f6f8;
+  background: var(--cs-bg);
+}
+
+/* per-case accent, taken from the client's own mark */
+.ac-blue   { --ac: #2563eb; --ac-soft: #eaf0ff; }
+.ac-teal   { --ac: #0d9488; --ac-soft: #e6f5f3; }
+.ac-violet { --ac: #7c3aed; --ac-soft: #f1eaff; }
+.ac-amber  { --ac: #d97706; --ac-soft: #fdf1e3; }
+.ac-rose   { --ac: #e11d48; --ac-soft: #ffe9ee; }
+.ac-sky    { --ac: #0284c7; --ac-soft: #e5f3fb; }
+
+.cs-intro { padding: 96px 0 56px; }
+
+.slides { position: relative; }
+
+.sl {
+  position: sticky;
+  top: 74px;
+  height: calc(100vh - 74px);
+  height: calc(100svh - 74px);
+  min-height: 640px;
+  display: flex;
+  align-items: stretch;
+  overflow: hidden;
+  background: var(--cs-bg);
+}
+.sl-inner {
+  flex: 1;
+  display: flex;
+  align-items: stretch;
+  will-change: transform, opacity;
+}
+
+/* registration ticks at half height. These sit on .sl rather than .sl-box
+   because the box sets overflow:hidden to crop the device, which would clip
+   its own pseudo-elements. */
+.sl::before,
+.sl::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  z-index: 1;
+  width: 34px;
+  height: 1px;
+  background: var(--cs-edge);
+}
+.sl::before { left: 0; }
+.sl::after  { right: 0; }
+
+/* full-bleed rather than the 1160px page grid — the frame runs to the edges */
+.sl-frame {
+  position: relative;
+  max-width: none;
+  padding: 16px 34px 26px;
+  display: flex;
+  flex-direction: column;
+}
+.sl-frame::before,
+.sl-frame::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  width: 1px;
+  background: var(--cs-edge);
+}
+.sl-frame::before { top: 0; height: 16px; }
+.sl-frame::after  { bottom: 0; height: 26px; }
+
+.sl-num {
+  font-size: .68rem;
+  font-weight: 500;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: #9b9ba1;
+  margin: 0 0 10px 14px;
+}
+
+.sl-box {
+  position: relative;
+  flex: 1;
+  border: 1px solid var(--cs-edge);
+  overflow: hidden;
+}
+
+/* ----- two layouts -----
+   Split: device beside the copy, alternating sides.
+   Wide:  copy centred at the top, device below it and cropped by the frame. */
+
+.sl-grid { height: 100%; display: grid; }
+
+.sl--split .sl-grid {
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+}
+.sl--split .sl-copy { order: 2; }
+.sl--split .sl-art  { order: 1; }
+.sl--split:nth-of-type(4n + 3) .sl-copy { order: 1; }
+.sl--split:nth-of-type(4n + 3) .sl-art  { order: 2; }
+
+.sl--wide { --mbw: min(44vw, 560px); }
+.sl--wide .sl-grid {
+  grid-template-rows: auto 1fr;
+  align-content: start;
+  padding-top: clamp(18px, 3.5vh, 40px);
+}
+
+/* ----- copy ----- */
+
+.sl-copy {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 0 clamp(16px, 4vw, 64px);
+}
+
+/* The copy arrives on the same scrubbed value as the device. Each child reads a
+   shifted, renormalised slice of --enter, so they stagger without a separate
+   transition that could drift out of step with the scroll. --enter defaults to
+   1, which clamps every slice to 1, so with no JS the copy is simply present. */
+.sl-copy > * {
+  --ei: clamp(0, calc((var(--enter, 1) - var(--d, 0) * .07) / .66), 1);
+  opacity: var(--ei);
+  transform: translateY(calc((1 - var(--ei)) * 22px));
+  will-change: transform, opacity;
+}
+.sl-copy > *:nth-child(1) { --d: 0; }
+.sl-copy > *:nth-child(2) { --d: 1; }
+.sl-copy > *:nth-child(3) { --d: 2; }
+.sl-copy > *:nth-child(4) { --d: 3; }
+
+.sl-marks {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 22px;
+  margin-bottom: 24px;
+  font-size: .7rem;
+  font-weight: 700;
+  letter-spacing: .1em;
+}
+.sl-mark { color: #cfd2d8; }
+.sl-client {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: .95rem;
+  font-weight: 800;
+  letter-spacing: .01em;
+  color: var(--ac);
+}
+.sl-client i {
+  width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  background: var(--ac);
+}
+
+/* the page typeface, matching every other heading on the site */
+.sl-title {
+  margin: 0 0 20px;
+  font-family: var(--font);
+  line-height: 1.04;
+  letter-spacing: -.03em;
+  color: #0b0b0d;
+  /* the size lives here, not on the spans: `ch` in the max-width below resolves
+     against this element's own font-size, so leaving the h3 at its inherited
+     1.2rem made 30ch about 315px and wrapped the headline three ways */
+  font-size: clamp(2.1rem, 3.7vw, 3.5rem);
+}
+.sl-title__a,
+.sl-title__b {
+  display: block;
+  font-weight: 700;
+  font-size: inherit;
+}
+.sl--wide .sl-title { max-width: 30ch; }
+
+.sl-tags {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 24px;
+  margin: 0 0 28px;
+  font-size: .78rem;
+  font-weight: 600;
+  letter-spacing: .14em;
+  color: #c3c6cc;
+}
+
+.sl-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 30px;
+  border: 1px solid #0b0b0d;
+  border-radius: 999px;
+  font-size: .82rem;
+  font-weight: 500;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  transition: background .2s ease, color .2s ease;
+}
+.sl-cta span { transition: transform .2s ease; }
+.sl-cta:hover { background: #0b0b0d; color: #fff; }
+.sl-cta:hover span { transform: translateX(4px); }
+
+/* ----- the entrance and the 3D stage -----
+   main.js writes --enter (0→1) as the slide climbs into view. Each slide sets
+   its own start and settle values inline in the HTML, so one rule drives six
+   different arrivals. The devices settle at a three-quarter angle rather than
+   flat — --ry1 and --rx1 are the resting pose, not zero — which is what keeps
+   them reading as objects. --enter defaults to 1 so they sit finished with no JS. */
+
+.sl-art {
+  position: relative;
+  display: grid;
+  place-items: center;
+  height: 100%;
+  min-height: 0;
+  perspective: 2200px;
+  perspective-origin: 50% 44%;
+}
+.dev {
+  --e: var(--enter, 1);
+  position: relative;
+  transform-style: preserve-3d;
+  transform:
+    translateY(calc(var(--ty0, 0px) * (1 - var(--e))))
+    rotateY(calc((var(--ry0, 0) + (var(--ry1, 0) - var(--ry0, 0)) * var(--e)) * 1deg))
+    rotateX(calc((var(--rx0, 0) + (var(--rx1, 0) - var(--rx0, 0)) * var(--e)) * 1deg))
+    rotate(calc((var(--r0, 0) + (var(--r1, 0) - var(--r0, 0)) * var(--e)) * 1deg))
+    scale(calc(var(--sc0, 1) + (1 - var(--sc0, 1)) * var(--e)));
+  will-change: transform;
+}
+.sl--wide .dev { align-self: center; }
+/* The deck is absolutely positioned, so it adds no layout height and centring
+   would centre the lid alone, pushing the deck out of the crop. Reserve its
+   projected height here — padding, because a margin on .mb would collapse
+   straight out of .dev, and padding on .mb would move the deck (its `top: 100%`
+   resolves against the padding box). Deck is 64% of the lid, laid back 74deg,
+   lid is 10.3/16 of the width, so ~0.115 x width. */
+.sl--wide .dev { padding-bottom: calc(var(--mbw) * .115); }
+
+/* contact shadow on the ground plane, not on the device */
+.dev-shadow {
+  position: absolute;
+  left: 50%;
+  bottom: -4%;
+  width: 74%;
+  height: 60px;
+  transform: translate(-50%, 0) rotateX(84deg);
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(18, 20, 28, .16), rgba(18, 20, 28, 0) 72%);
+  filter: blur(14px);
+  pointer-events: none;
+}
+.dev-shadow--wide { width: 88%; height: 78px; bottom: -8%; }
+
+/* ----- iPhone -----
+   The body is the titanium rail with the screen inset into it. Thickness is a
+   real face: .iph-edge is a panel hinged on the right edge and swung back 90°,
+   so at the settled -19deg it is genuinely visible rather than painted on. */
+
+.iph {
+  position: relative;
+  width: clamp(270px, 24vw, 380px);
+  aspect-ratio: 41 / 84;
+  transform-style: preserve-3d;
+}
+
+.iph-rail {
+  position: absolute;
+  inset: 0;
+  padding: 2.6%;
+  border-radius: 13.5% / 6.6%;
+  background: #fff;
+  /* the body is a contour drawing: an outer stroke and a faint inner rim, the
+     way a technical mockup reads. Colour belongs to the screen, not the shell. */
+  border: 1.5px solid #d9dce1;
+  box-shadow:
+    inset 0 0 0 1.5px #eff1f4,
+    0 26px 60px rgba(18, 20, 28, .07);
+}
+.iph-screen {
+  position: relative;
+  height: 100%;
+  border-radius: 11.4% / 5.6%;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: inset 0 0 0 1px #e6e8ec;
+  /* the screen is a container so its contents can be sized in cqw/em and stay
+     in proportion at every device width — fixed rem sizes drift as the phone
+     scales with the viewport */
+  container-type: inline-size;
+}
+/* home indicator — the only mark on the glass, as in the reference */
+.iph-island {
+  position: absolute;
+  bottom: 1.5%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 32%;
+  height: 4px;
+  border-radius: 999px;
+  background: #16181c;
+  opacity: .82;
+  z-index: 4;
+}
+
+/* Both side walls exist; only the one facing the viewer is seen, since the
+   other swings behind the body and is occluded. Slides that mirror the pose
+   (--ry1 positive) show the left one, so building only the right would leave
+   those phones looking flat. */
+.iph-edge {
+  position: absolute;
+  top: 2.5%;
+  width: 26px;
+  height: 95%;
+  border-radius: 6px;
+  background: #fbfbfc;
+  box-shadow: inset 0 0 0 1.5px #dcdee3;
+}
+.iph-edge--r { right: 0; transform-origin: 100% 50%; transform: rotateY(90deg); }
+.iph-edge--l { left: 0;  transform-origin: 0 50%;    transform: rotateY(-90deg); }
+
+/* buttons, sitting proud of the rail on the side faces */
+.iph-key {
+  position: absolute;
+  border-radius: 3px;
+  background: #fff;
+  box-shadow: inset 0 0 0 1.5px #d9dce1;
+  transform: translateZ(-13px);
+}
+.iph-key--mute { left: -2px; top: 16%; width: 4px; height: 3.4%; }
+.iph-key--up   { left: -2px; top: 23%; width: 4px; height: 6.6%; }
+.iph-key--dn   { left: -2px; top: 31.5%; width: 4px; height: 6.6%; }
+.iph-key--pw   { right: -2px; top: 26%; width: 4px; height: 9%; }
+
+/* ----- MacBook -----
+   The lid stands up and the deck lies back from its bottom edge. That single
+   rotateX on .mb-deck is what makes it read as a laptop rather than a picture
+   of one, so keep the shared preserve-3d chain intact if you touch this. */
+
+.mb {
+  position: relative;
+  width: var(--mbw, min(44vw, 560px));
+  transform-style: preserve-3d;
+}
+.mb-lid {
+  position: relative;
+  transform-style: preserve-3d;
+  transform-origin: 50% 100%;
+  transform: rotateX(-3deg);
+}
+.mb-bezel {
+  position: relative;
+  aspect-ratio: 16 / 10.3;
+  padding: 1.5%;
+  padding-bottom: 2.6%;
+  border-radius: 14px 14px 5px 5px;
+  background: #fff;
+  border: 1.5px solid #d9dce1;
+  box-shadow:
+    inset 0 0 0 1.5px #eff1f4,
+    0 24px 56px rgba(18, 20, 28, .07);
+}
+.mb-cam {
+  position: absolute;
+  top: .6%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #d5d8dd;
+}
+
+/* the deck, hinged at the lid's bottom edge and laid back */
+.mb-deck {
+  position: absolute;
+  top: 100%;
+  left: -1.5%;
+  width: 103%;
+  height: 64%;
+  transform-origin: 50% 0;
+  transform: rotateX(74deg);
+  border-radius: 4px 4px 16px 16px;
+  background: #fff;
+  border: 1.5px solid #d9dce1;
+  box-shadow: 0 16px 34px rgba(18, 20, 28, .06);
+}
+.mb-hinge {
+  position: absolute;
+  top: 0;
+  left: 12%;
+  width: 76%;
+  height: 5px;
+  border-radius: 0 0 5px 5px;
+  background: #e4e6ea;
+}
+/* the key grid, drawn rather than marked up */
+.mb-keys {
+  position: absolute;
+  top: 15%;
+  left: 7%;
+  width: 86%;
+  height: 46%;
+  border-radius: 4px;
+  background:
+    repeating-linear-gradient(90deg, #e2e4e9 0 5.1%, rgba(0, 0, 0, 0) 5.1% 6.4%),
+    repeating-linear-gradient(180deg, #e2e4e9 0 14.5%, rgba(0, 0, 0, 0) 14.5% 18.6%);
+}
+.mb-pad {
+  position: absolute;
+  bottom: 7%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 30%;
+  height: 26%;
+  border-radius: 5px;
+  background: #fff;
+  box-shadow: inset 0 0 0 1.5px #e2e4e9;
+}
+
+/* ----- screens -----
+   Shared by both devices: the phone insets these into .iph-screen, the laptop
+   into .mb-bezel, so the same three phone layouts and three desktop layouts
+   only ever describe content. */
+
+.scr {
+  position: relative;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: #f6f7f5;
+}
+/* onboarding — a scene rather than a backdrop. Floating cards over a tinted
+   mesh carry the case's own story (documents going through checks), and the
+   ground darkens toward the foot so the copy over it stays legible. */
+.scr--intro {
+  font-size: 4.3cqw;
+  padding: 1.5em 1.3em 1.3em;
+  background: #eef0f4;
+}
+.on-photo {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(to top, rgba(20, 24, 32, .62) 0%, rgba(20, 24, 32, .16) 32%, rgba(20, 24, 32, 0) 56%),
+    radial-gradient(58% 42% at 20% 16%, color-mix(in srgb, var(--ac) 52%, #fff) 0%, rgba(255, 255, 255, 0) 64%),
+    radial-gradient(52% 38% at 86% 26%, color-mix(in srgb, var(--ac) 26%, #fff) 0%, rgba(255, 255, 255, 0) 62%),
+    radial-gradient(64% 44% at 62% 62%, rgba(255, 255, 255, .85) 0%, rgba(255, 255, 255, 0) 62%),
+    linear-gradient(158deg, #eef1f7 0%, #dde3ee 48%, #c9d1e0 100%);
+}
+
+.on-top { position: relative; display: flex; align-items: center; }
+.on-skip { font-size: .82em; font-weight: 600; color: #55606f; }
+.on-dots { display: flex; gap: .3em; margin-left: auto; }
+.on-dots i { width: .38em; height: .38em; border-radius: 50%; background: rgba(60, 72, 90, .3); }
+.on-dots i.on { width: 1.1em; border-radius: 999px; background: var(--ac); }
+
+/* ----- the floating scene ----- */
+
+.on-stage {
+  position: relative;
+  flex: 1;
+  margin: 1.1em 0 .6em;
+}
+.on-card {
+  position: absolute;
+  border-radius: .85em;
+  background: #fff;
+  box-shadow: 0 .7em 1.6em rgba(20, 28, 45, .16);
+}
+
+/* the document under review */
+.on-card--doc {
+  top: 1%;
+  left: 3%;
+  width: 71%;
+  padding: .85em;
+  display: flex;
+  flex-direction: column;
+  gap: .45em;
+  transform: rotate(-5deg);
+}
+.on-doc__head { display: flex; align-items: center; gap: .5em; margin-bottom: .15em; }
+.on-doc__av {
+  width: 1.7em;
+  height: 1.7em;
+  border-radius: .5em;
+  flex: none;
+  background: radial-gradient(70% 60% at 50% 30%, #f2c9a4, #cf9468);
+}
+.on-doc__head b { flex: 1; height: .5em; border-radius: .25em; background: #e7eaf0; }
+.on-ln { height: .42em; border-radius: .25em; background: #eef0f4; }
+.on-ln.w80 { width: 80%; }
+.on-ln.w58 { width: 58%; }
+.on-doc__strip {
+  height: 1.5em;
+  border-radius: .35em;
+  margin-top: .3em;
+  background:
+    repeating-linear-gradient(90deg,
+      color-mix(in srgb, var(--ac) 22%, #fff) 0 .18em,
+      rgba(255, 255, 255, 0) .18em .42em),
+    color-mix(in srgb, var(--ac) 8%, #fff);
+}
+
+/* the check that clears it */
+.on-card--tick {
+  top: 38%;
+  right: 1%;
+  width: 65%;
+  padding: .7em .8em;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: .55em;
+  transform: rotate(3.5deg);
+}
+.on-tick {
+  width: 1.5em;
+  height: 1.5em;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: color-mix(in srgb, var(--ac) 14%, #fff);
+}
+/* the mark itself, drawn from two borders */
+.on-tick::before {
+  content: "";
+  width: .52em;
+  height: .28em;
+  margin-top: -.12em;
+  border-left: .15em solid var(--ac);
+  border-bottom: .15em solid var(--ac);
+  transform: rotate(-45deg);
+}
+.on-card__t { font-size: .72em; font-weight: 600; color: #232833; white-space: nowrap; }
+.on-card__s { font-size: .64em; font-weight: 600; color: #9aa2b0; }
+
+/* the outcome */
+.on-card--rate {
+  top: 66%;
+  left: 7%;
+  padding: .7em .95em;
+  transform: rotate(-2.5deg);
+}
+.on-card--rate b {
+  display: block;
+  font-size: 1.15em;
+  font-weight: 800;
+  letter-spacing: -.035em;
+  color: var(--ac);
+  line-height: 1.1;
+}
+.on-card--rate span { font-size: .62em; font-weight: 600; color: #8b93a1; }
+
+/* ----- copy over the darkened foot ----- */
+
+.on-copy { position: relative; margin-bottom: 1.1em; }
+.on-hi,
+.on-brand,
+.on-sub { margin: 0; letter-spacing: -.03em; line-height: 1.02; }
+.on-hi { font-size: 1.9em; font-weight: 600; color: #fff; }
+.on-brand {
+  font-size: 2.1em;
+  font-weight: 800;
+  color: color-mix(in srgb, var(--ac) 40%, #fff);
+}
+.on-sub {
+  margin-top: .5em;
+  font-size: .84em;
+  font-weight: 500;
+  letter-spacing: -.01em;
+  color: rgba(255, 255, 255, .84);
+}
+.on-btn {
+  position: relative;
+  display: grid;
+  place-items: center;
+  height: 3.1em;
+  border-radius: 999px;
+  background: var(--ac);
+  color: #fff;
+  font-size: .92em;
+  font-weight: 600;
+  box-shadow: 0 .5em 1.2em rgba(20, 24, 18, .26);
+}
+
+.scr--chat  { padding: 8% 6% 6%; background: #f7f8f5; }
+.scr--stats { font-size: 4.3cqw; padding: 1.6em 1.2em 1em; background: #fbfbfa; }
+
+/* shared small UI atoms */
+.u-chip {
+  display: inline-grid;
+  place-items: center;
+  height: 22px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: #fff;
+  border: 1px solid var(--cs-edge);
+  font-size: .58rem;
+  font-weight: 700;
+  color: #7d838e;
+  white-space: nowrap;
+}
+.u-chip--on { background: var(--ac-soft); border-color: transparent; color: var(--ac); }
+.u-ic {
+  width: 15px;
+  height: 2px;
+  border-radius: 2px;
+  background: #b9bec7;
+  box-shadow: 0 5px 0 #b9bec7;
+}
+.u-av {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  margin-left: auto;
+  background: linear-gradient(150deg, var(--ac-soft), var(--ac));
+}
+
+/* assistant — matched to the reference mockup: cream ground, a soft segmented
+   control, the mascot, an italic greeting over a bold question, floating prompt
+   chips and a raised input bar. Everything is sized in em off a cqw base, so it
+   holds its proportions whatever width the device resolves to. */
+.scr--chat {
+  font-size: 4.3cqw;
+  padding: 1.7em 1.3em 1.2em;
+  background: #f4f6ef;
+}
+
+.ct-top {
+  display: flex;
+  align-items: center;
+  gap: .5em;
+  margin-bottom: 1.5em;
+}
+.ct-burger {
+  position: relative;
+  width: 1.1em;
+  height: .15em;
+  border-radius: .1em;
+  background: #22252a;
+  flex: none;
+}
+.ct-burger::after {
+  content: "";
+  position: absolute;
+  top: .38em;
+  left: 0;
+  width: .72em;
+  height: .15em;
+  border-radius: .1em;
+  background: #22252a;
+}
+/* the two-up control: the active half is a raised white pill on a soft tint */
+.ct-seg {
+  display: flex;
+  align-items: center;
+  gap: .15em;
+  margin-inline: auto;
+  padding: .2em;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--ac) 12%, #fff);
+  font-size: .78em;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.ct-seg__a,
+.ct-seg__b { padding: .38em .7em; border-radius: 999px; }
+.ct-seg__a {
+  background: #fff;
+  color: color-mix(in srgb, var(--ac) 78%, #303a2a);
+  box-shadow: 0 .08em .22em rgba(20, 30, 15, .1);
+}
+.ct-seg__b { color: color-mix(in srgb, var(--ac) 72%, #4a5540); }
+.ct-av {
+  width: 1.9em;
+  height: 1.9em;
+  border-radius: 50%;
+  flex: none;
+  background:
+    radial-gradient(70% 60% at 50% 28%, #f2c9a4 0%, #e0a97e 60%, #cf9468 100%);
+  box-shadow: inset 0 -.5em .6em -.3em color-mix(in srgb, var(--ac) 60%, #6d8a55);
+}
+
+.ct-bot {
+  width: 42%;
+  margin: .3em auto 1em;
+  display: block;
+  filter: drop-shadow(0 .7em 1em rgba(30, 45, 20, .1));
+}
+
+.ct-hi,
+.ct-ask { margin: 0; text-align: center; color: #17191c; }
+.ct-hi {
+  font-size: .95em;
+  font-style: italic;
+  font-weight: 500;
+  letter-spacing: -.01em;
+}
+.ct-ask {
+  font-size: 1.28em;
+  font-weight: 700;
+  letter-spacing: -.035em;
+  line-height: 1.12;
+  margin-bottom: 1.5em;
+}
+
+/* the chips float rather than sit in a list — soft shadow, no border */
+.ct-chips {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .55em;
+}
+.ct-chips span {
+  padding: .62em 1.05em;
+  border-radius: 999px;
+  background: #fff;
+  box-shadow: 0 .2em .7em rgba(30, 45, 20, .08);
+  font-size: .84em;
+  font-weight: 500;
+  color: #23262a;
+  white-space: nowrap;
+}
+
+.ct-bar {
+  display: flex;
+  align-items: center;
+  gap: .5em;
+  margin-top: auto;
+  padding: .45em;
+  border-radius: 999px;
+  background: #fff;
+  box-shadow: 0 .2em .8em rgba(30, 45, 20, .09);
+}
+.ct-plus,
+.ct-mic {
+  display: grid;
+  place-items: center;
+  width: 1.9em;
+  height: 1.9em;
+  border-radius: 50%;
+  flex: none;
+  background: color-mix(in srgb, var(--ac) 12%, #fff);
+  color: color-mix(in srgb, var(--ac) 70%, #2b3327);
+  font-size: 1em;
+  font-weight: 500;
+}
+/* the mic, drawn rather than an icon font */
+.ct-mic::before {
+  content: "";
+  width: .34em;
+  height: .62em;
+  border-radius: .2em;
+  background: color-mix(in srgb, var(--ac) 70%, #2b3327);
+  box-shadow: 0 .5em 0 -.17em color-mix(in srgb, var(--ac) 70%, #2b3327);
+}
+.ct-ph {
+  flex: 1;
+  font-size: .84em;
+  color: #9aa295;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* metrics — a hero figure, a charted card and a short activity list, in the
+   same em-off-cqw system as the other screens. */
+.st-top { display: flex; align-items: center; gap: .6em; margin-bottom: 1.2em; }
+.st-back {
+  width: .58em;
+  height: .58em;
+  border-left: .13em solid #2a2d31;
+  border-bottom: .13em solid #2a2d31;
+  transform: rotate(45deg);
+  flex: none;
+}
+.st-title { font-size: .95em; font-weight: 700; letter-spacing: -.02em; color: #17191c; }
+.st-av {
+  width: 1.8em;
+  height: 1.8em;
+  border-radius: 50%;
+  margin-left: auto;
+  flex: none;
+  background: radial-gradient(70% 60% at 50% 28%, #f2c9a4, #cf9468);
+}
+
+.st-hero {
+  padding: 1em 1.1em 1.1em;
+  border-radius: 1em;
+  background: color-mix(in srgb, var(--ac) 11%, #fff);
+  margin-bottom: .8em;
+}
+.st-label { display: block; font-size: .74em; font-weight: 600; color: #6b7178; }
+.st-num {
+  display: block;
+  font-size: 2.35em;
+  font-weight: 800;
+  letter-spacing: -.045em;
+  line-height: 1.05;
+  color: var(--ac);
+}
+.st-delta {
+  display: inline-block;
+  margin-top: .3em;
+  font-size: .68em;
+  font-weight: 600;
+  color: color-mix(in srgb, var(--ac) 72%, #2f3a33);
+}
+
+.st-card { padding: .9em 1em 1em; border-radius: 1em; border: 1px solid #e9eaee; margin-bottom: .8em; }
+.st-card__h { display: block; font-size: .72em; font-weight: 600; color: #6b7178; margin-bottom: .7em; }
+.st-bars { display: flex; align-items: flex-end; gap: .42em; height: 4.6em; }
+.st-bars i { flex: 1; height: var(--h); border-radius: .28em .28em .12em .12em; background: #e6e8ec; }
+.st-bars i:nth-child(4) { background: var(--ac); }
+.st-axis { display: flex; gap: .42em; margin-top: .45em; font-size: .58em; font-weight: 600; color: #aeb4bb; }
+.st-axis span { flex: 1; text-align: center; }
+
+.st-rows { display: flex; flex-direction: column; gap: .55em; }
+.st-row { display: flex; align-items: center; gap: .6em; font-size: .74em; }
+.st-row i { font-style: normal; font-size: .95em; }
+.st-row em {
+  flex: 1;
+  font-style: normal;
+  font-weight: 500;
+  color: #2a2d31;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.st-row b { font-weight: 600; color: #9aa0a7; }
+
+.st-tabs { display: flex; justify-content: space-around; margin-top: auto; padding-top: 1em; }
+.st-tabs i { width: 1.4em; height: .28em; border-radius: .2em; background: #e2e4e9; }
+.st-tabs i.on { background: var(--ac); }
+
+/* ----- desktop screen chrome ----- */
+
+.lp-ui {
+  height: 100%;
+  border-radius: 4px;
+  overflow: hidden;
+  background: #fcfdff;
+  display: flex;
+  flex-direction: column;
+}
+.lp-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--cs-edge);
+  background: #fff;
+}
+.lp-mark {
+  font-size: .68rem;
+  font-weight: 800;
+  letter-spacing: .04em;
+  color: var(--ac);
+}
+.lp-live {
+  margin-left: auto;
+  display: inline-grid;
+  place-items: center;
+  height: 22px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: #16181d;
+  color: #fff;
+  font-size: .58rem;
+  font-weight: 700;
+}
+
+.lp-body { flex: 1; display: flex; min-height: 0; }
+.lp-side {
+  width: 17%;
+  padding: 14px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border-right: 1px solid var(--cs-edge);
+  background: #fff;
+}
+.lp-side span { height: 9px; border-radius: 5px; background: var(--cs-ui2); }
+.lp-side span.on { background: var(--ac-soft); }
+.lp-side span:nth-child(4) { width: 74%; }
+.lp-side span:nth-child(6) { width: 58%; }
+
+.lp-main { flex: 1; padding: 14px; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.lp-kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.lp-kpis span {
+  height: 46px;
+  border-radius: 9px;
+  border: 1px solid var(--cs-edge);
+  background: #fff;
+}
+.lp-kpis span.on { border-color: transparent; background: var(--ac-soft); }
+.lp-chart {
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid var(--cs-edge);
+  border-radius: 10px;
+  min-height: 0;
+}
+.lp-chart i { flex: 1; height: var(--h); border-radius: 4px 4px 2px 2px; background: var(--cs-ui); }
+.lp-chart i:nth-child(4) { background: var(--ac); }
+.lp-rows { display: flex; flex-direction: column; gap: 7px; }
+.lp-rows span { height: 8px; border-radius: 4px; background: var(--cs-ui2); }
+.lp-rows span:nth-child(2) { width: 72%; }
+.lp-rows span:nth-child(3) { width: 52%; }
+
+/* board */
+.lp-board { flex: 1; display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; padding: 14px; min-height: 0; }
+.lp-col { display: flex; flex-direction: column; gap: 9px; }
+.lp-colh { height: 9px; width: 58%; border-radius: 5px; background: var(--cs-ui); }
+.lp-card {
+  height: 54px;
+  border-radius: 9px;
+  border: 1px solid var(--cs-edge);
+  background: #fff;
+}
+.lp-card.on { border-color: transparent; background: var(--ac-soft); }
+
+/* document */
+.lp-doc { flex: 1; display: grid; grid-template-columns: 22% 1fr 14%; min-height: 0; }
+.lp-notes {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  border-right: 1px solid var(--cs-edge);
+  background: #fff;
+}
+.lp-note { height: 40px; border-radius: 8px; background: var(--cs-ui2); }
+.lp-note:nth-child(2) { background: var(--ac-soft); }
+.lp-page { padding: 22px 18px; text-align: center; background: #fbfaf8; }
+.lp-eyebrow { margin: 0 0 10px; font-size: .62rem; font-weight: 800; letter-spacing: .06em; color: var(--ac); }
+.lp-h {
+  margin: 0 0 10px;
+  font-size: clamp(.95rem, 1.6vw, 1.5rem);
+  font-weight: 700;
+  letter-spacing: -.03em;
+  line-height: 1.08;
+  color: #16181d;
+}
+.lp-sub { margin: 0 auto 14px; max-width: 30ch; font-size: .64rem; line-height: 1.5; color: #6c727c; }
+.lp-pills { display: flex; justify-content: center; gap: 8px; }
+.lp-pills span { height: 16px; width: 62px; border-radius: 999px; background: var(--cs-ui2); }
+.lp-pills span.a { background: #fdf1e3; }
+.lp-pills span.b { background: var(--ac-soft); }
+.lp-rail { padding: 12px; display: flex; flex-direction: column; gap: 9px; border-left: 1px solid var(--cs-edge); }
+.lp-rail span { height: 60px; border-radius: 8px; background: var(--cs-ui2); }
+
+/* ---------- testimonials: the card stack ----------
+   A profile list on the left drives an isometric stack on the right. The stack
+   carries one shared 3D rotation and the cards are separated purely in Z, so the
+   diagonal recession is the projection doing the work rather than hand-placed
+   offsets. Each card owns a fixed slot and the chosen one lifts out of it. The
+   rise and the fall are both transitions rather than a keyframe, which is what
+   lets a switch read as a hand-off: the outgoing card settles back into the row
+   first, then the incoming one comes up. A keyframe cannot do that — removing an
+   animation with fill:both jumps the transform instead of easing out of it. */
+
+.tm {
+  --tm-line: #e6e7ea;
+  --tm-ink: #17181c;
+  padding: 104px 0 156px;
+  background: linear-gradient(168deg, #fbfbfc 0%, #f2f3f5 52%, #eceef1 100%);
+  overflow: hidden;
+}
+/* A faint grain over the gradient. Flat CSS fills are perfectly smooth in a way
+   nothing physical is, and that cleanliness is a large part of why a section
+   like this looks machine-made. Two percent is enough to break it up. */
+.tm::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: .025;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.tm { position: relative; }
+
+.tm-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+  gap: 40px;
+  /* Deliberately start, not center. The quote animates its max-height when the
+     selection changes, so the left column's height swells mid-transition even
+     though it starts and ends the same. Centred, the row would re-centre on
+     every one of those frames and the whole stack would bounce. Anchored to the
+     top, the stack cannot move no matter what the left column does. */
+  align-items: start;
+}
+
+/* ----- left column ----- */
+
+.tm-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 16px 7px 7px;
+  border-radius: 999px;
+  background: #fff;
+  box-shadow:
+    0 0 0 1px rgba(20, 22, 30, .05),
+    0 6px 18px rgba(20, 22, 30, .06);
+  font-size: .86rem;
+  font-weight: 600;
+  color: var(--tm-ink);
+  margin-bottom: 26px;
+}
+.tm-badge i {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--tm-ink);
+  position: relative;
+}
+/* the spark inside the badge */
+.tm-badge i::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 7px;
+  height: 11px;
+  background: #fff;
+  clip-path: polygon(58% 0, 12% 58%, 45% 58%, 38% 100%, 88% 40%, 53% 40%);
+}
+
+.tm-title {
+  font-size: clamp(2.2rem, 3.6vw, 3.4rem);
+  line-height: 1.06;
+  letter-spacing: -.04em;
+  color: var(--tm-ink);
+  margin: 0 0 40px;
+}
+
+/* the list sits on a faint panel; the chosen row is white and raised off it,
+   which is what gives the reference its sense of one card pulled forward */
+.tm-list {
+  list-style: none;
+  margin: 0;
+  padding: 6px;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, .45);
+  box-shadow: inset 0 0 0 1px rgba(120, 128, 145, .07);
+}
+
+.tm-item {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 14px 18px;
+  border: 0;
+  border-radius: 18px;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+  transition: background .35s ease, box-shadow .35s ease, transform .35s ease;
+}
+/* only the chosen profile is raised, and only it shows its quote */
+.tm-item.is-on {
+  background: #fff;
+  box-shadow:
+    0 0 0 1px rgba(20, 22, 30, .04),
+    0 2px 4px rgba(20, 22, 30, .04),
+    0 18px 40px rgba(20, 22, 30, .1);
+}
+
+.tm-mono {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  flex: none;
+  border-radius: 12px;
+  font-size: .82rem;
+  font-weight: 800;
+  letter-spacing: .04em;
+  color: var(--ac);
+  background: color-mix(in srgb, var(--ac) 14%, #fff);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ac) 22%, #fff);
+}
+
+.tm-meta { display: flex; flex-direction: column; min-width: 0; }
+.tm-name {
+  font-size: .92rem;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--tm-ink);
+}
+.tm-role { font-size: .88rem; color: #8b9099; margin-top: 2px; }
+
+/* The row animates its own height from 0fr to 1fr. max-height cannot do this
+   smoothly: it eases the cap, not the content, so a quote shorter than the cap
+   spends part of the transition going nowhere — which is exactly what made the
+   shift between two testimonials feel like it stuttered. */
+.tm-quote-wrap {
+  display: grid;
+  grid-template-rows: minmax(0, 0fr);
+  transition: grid-template-rows .5s cubic-bezier(.22, 1, .36, 1);
+}
+.tm-item.is-on .tm-quote-wrap { grid-template-rows: minmax(0, 1fr); }
+
+.tm-quote {
+  display: block;
+  overflow: hidden;
+  min-height: 0;
+  padding-top: 8px;
+  font-size: .92rem;
+  line-height: 1.55;
+  color: #5d636c;
+}
+
+/* the words arrive one at a time — main.js wraps each in a span and numbers it,
+   and the stagger comes off that index. Reading pace, not a typewriter gimmick:
+   26ms is fast enough not to hold anyone up, slow enough to feel written. */
+.tm-quote span {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity .3s ease, transform .3s cubic-bezier(.22, 1, .36, 1);
+}
+.tm-item.is-on .tm-quote span {
+  opacity: 1;
+  transform: none;
+  transition-delay: calc(var(--i) * 26ms + .14s);
+}
+
+/* ----- right column: the isometric stack ----- */
+
+.tm-stage {
+  position: relative;
+  min-height: 620px;
+  display: grid;
+  place-items: center;
+  padding-top: 40px;
+  /* No perspective, deliberately. The reference is orthographic — the slabs at
+     the back are exactly the same size as the one at the front. Adding
+     perspective shrinks them and converges their edges, which is what made the
+     earlier version read as photographed rather than drafted. Without it the 3D
+     transform collapses to a parallel projection, and translateZ still offsets
+     each card because it is applied inside the rotated frame. */
+}
+.tm-stack {
+  position: relative;
+  width: min(100%, 390px);
+  aspect-ratio: 3 / 2;
+  transform: translate(-19%, 110%);
+}
+
+.tm-card {
+  --thick: 42px;
+  --lift: 0px;
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  /* The lift sits before the rotations so it runs straight up the screen.
+     --k is the card's fixed slot; the row recedes along the card's own -Z,
+     which in this pose projects up and to the right. */
+  transform:
+    translateY(var(--lift))
+    rotateX(-38deg) rotateY(-26deg)
+    translateZ(calc(var(--k) * -96px));
+  /* Falling back into the row is the un-delayed transition; rising is the same
+     move with a delay, so switching profiles reads as a hand-off — the lifted
+     card settles into its slot before the next one comes up. */
+  /* the slab edge below is a stack of box-shadows, which are expensive to
+     re-rasterise while the transform animates — promoting the card keeps the
+     move on the compositor */
+  will-change: transform;
+  backface-visibility: hidden;
+  transition: transform .5s cubic-bezier(.32, 0, .24, 1);
+}
+.tm-card.is-on {
+  --lift: -150px;
+  /* a short delay, not a pause: the fall and the rise overlap so the hand-off
+     is continuous rather than stop-start */
+  transition: transform .62s cubic-bezier(.2, .85, .3, 1) .1s;
+}
+
+/* ----- the slab -----
+   rotateX negative puts the extrusion up-and-right, so the top and right faces
+   are the ones that show — matching the reference. The back face is drawn too,
+   which is what makes a waiting slab read as a see-through wireframe. */
+.tm-edge {
+  position: absolute;
+  background: #fbfbfc;
+  box-shadow: inset 0 0 0 1px #e3e4e8;
+  transition: background .35s ease, box-shadow .35s ease;
+}
+.tm-edge--r {
+  top: 0; right: 0;
+  width: var(--thick); height: 100%;
+  transform-origin: 100% 50%;
+  transform: rotateY(90deg);
+}
+.tm-edge--l {
+  top: 0; left: 0;
+  width: var(--thick); height: 100%;
+  transform-origin: 0 50%;
+  transform: rotateY(-90deg);
+}
+.tm-edge--t {
+  top: 0; left: 0;
+  width: 100%; height: var(--thick);
+  transform-origin: 50% 0;
+  transform: rotateX(90deg);
+}
+.tm-edge--b {
+  bottom: 0; left: 0;
+  width: 100%; height: var(--thick);
+  transform-origin: 50% 100%;
+  transform: rotateX(-90deg);
+}
+.tm-edge--back {
+  inset: 0;
+  width: auto; height: auto;
+  transform: translateZ(calc(var(--thick) * -1));
+}
+
+.tm-front {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: 45% 1fr;
+  overflow: hidden;
+  border-radius: 4px;
+  background: #fff;
+  box-shadow: inset 0 0 0 1px #e3e4e8;
+  transition: background .35s ease, box-shadow .45s ease;
+}
+
+/* waiting in the row: nothing but edges */
+/* Stroke weight falls off with depth instead of every box being the same
+   flat line — that uniformity is what made the row read as generated rather
+   than drawn. Slot 0 sits at .40 alpha, the far one at about .15. */
+.tm-card:not(.is-on) .tm-front,
+.tm-card:not(.is-on) .tm-edge {
+  background: transparent;
+  box-shadow: inset 0 0 0 1px rgba(116, 126, 146, calc(.4 - var(--k) * .05));
+}
+.tm-front > * { transition: opacity .24s ease; }
+.tm-card:not(.is-on) .tm-front > * { opacity: 0; }
+.tm-card.is-on .tm-front > * { transition: opacity .34s ease .28s; }
+
+/* The back face draws a second full-size rectangle offset behind the front one,
+   which reads as a loose plane sitting behind the box rather than part of it.
+   Dropping it everywhere leaves each box as its front panel plus its four thin
+   side bands — a solid-reading cuboid. It costs the see-through wireframe look,
+   which is the trade. */
+.tm-edge--back { display: none; }
+
+/* the solid card hides its far faces */
+.tm-card.is-on .tm-edge--back,
+.tm-card.is-on .tm-edge--l,
+.tm-card.is-on .tm-edge--b { display: none; }
+
+/* The two faces that do show have to be shaded, or the lifted slab is white on
+   white and reads as a flat card with the text floating on it. Giving the top
+   face the light and the right face the shadow is what makes the content sit on
+   a solid box. */
+/* The lifted card cannot use the 3D side faces the waiting boxes use. CSS 3D
+   sorts whole elements rather than pixels, and once .tm-front is opaque the
+   browser puts that single quad in front of the side faces and they vanish —
+   verified with a 160px-thick face painted red, which rendered nothing at all.
+   So the solid slab's depth is stepped box-shadows instead: they are drawn in
+   the front face's own plane and then carried by the card's transform, which
+   lands them along its top and right edges exactly where the extrusion reads. */
+.tm-card.is-on .tm-edge--t,
+.tm-card.is-on .tm-edge--r { display: none; }
+
+.tm-photo {
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(72% 58% at 50% 24%, color-mix(in srgb, var(--ac) 24%, #fff) 0%, rgba(255, 255, 255, 0) 68%),
+    linear-gradient(168deg, #eceef1 0%, #e0e3e8 58%, #d3d7de 100%);
+}
+.tm-photo b {
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: color-mix(in srgb, var(--ac) 70%, #4b5158);
+}
+
+.tm-body {
+  padding: 18px 18px 16px;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.tm-eyebrow {
+  align-self: flex-start;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: #f1f2f5;
+  font-size: .5rem;
+  font-weight: 600;
+  color: #9ba1a9;
+  margin-bottom: 8px;
+}
+.tm-body__name {
+  margin: 0 0 1px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: -.035em;
+  line-height: 1.08;
+  color: var(--tm-ink);
+}
+.tm-body__role { margin: 0 0 10px; font-size: .68rem; font-weight: 500; color: #8d939b; }
+.tm-body__q { margin: 0; font-size: .66rem; line-height: 1.6; color: #6a7078; }
+.tm-body__more {
+  margin-top: auto;
+  padding-top: 8px;
+  font-size: .56rem;
+  font-weight: 600;
+  color: #a9aeb6;
+}
+
+.tm-card.is-on .tm-front {
+  box-shadow:
+    inset 0 0 0 1px #eceef1,
+    4px -4px 0 #eef0f3, 8px -8px 0 #eef0f3, 12px -12px 0 #e7e9ee, 16px -16px 0 #e7e9ee, 20px -20px 0 #e7e9ee, 24px -24px 0 #dfe2e8, 28px -28px 0 #dfe2e8,
+    0 44px 74px rgba(20, 22, 30, .18);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tm-card,
+  .tm-card.is-on,
+  .tm-front,
+  .tm-front > * { transition: none; }
+}
+
+/* ---------- CTA ---------- */
+
+.cta {
+  background: linear-gradient(140deg, var(--navy), var(--navy-soft) 60%, #1e3a8a);
+  color: #fff;
+  border-radius: var(--radius-lg);
+  padding: 60px;
+  text-align: center;
+}
+.cta h2 { color: #fff; }
+.cta p { color: #b7c4dc; max-width: 52ch; margin-inline: auto; }
+.cta .hero-actions { justify-content: center; }
+
+/* ---------- page hero (inner pages) ---------- */
+
+.page-hero {
+  background: var(--navy);
+  color: #fff;
+  padding: 72px 0;
+}
+.page-hero h1 { margin-bottom: 14px; }
+.page-hero p { color: #b7c4dc; max-width: 60ch; margin: 0; }
+
+/* ---------- posts / jobs lists ---------- */
+
+.post { display: flex; flex-direction: column; }
+.post .meta {
+  color: var(--muted);
+  font-size: .82rem;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.job {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 24px 0;
+  border-bottom: 1px solid var(--line);
+}
+.job:first-of-type { border-top: 1px solid var(--line); }
+.job h3 { margin: 0 0 4px; }
+.job .job-meta { color: var(--muted); font-size: .92rem; }
+
+/* ---------- contact ---------- */
+
+.contact-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 56px;
+  align-items: start;
+}
+.field { margin-bottom: 18px; }
+.field label {
+  display: block;
+  font-size: .88rem;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+.field input,
+.field select,
+.field textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  font: inherit;
+  font-size: .95rem;
+  background: #fff;
+  color: var(--ink);
+}
+.field input:focus,
+.field select:focus,
+.field textarea:focus {
+  outline: 2px solid var(--blue);
+  outline-offset: 1px;
+  border-color: transparent;
+}
+.field textarea { min-height: 130px; resize: vertical; }
+.form-note { font-size: .85rem; color: var(--muted); }
+
+.detail-list { list-style: none; padding: 0; margin: 0; }
+.detail-list li { padding: 18px 0; border-bottom: 1px solid var(--line); }
+.detail-list strong {
+  display: block;
+  font-size: .8rem;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+
+/* ---------- footer ---------- */
+
+.site-footer {
+  background: var(--navy);
+  color: #b7c4dc;
+  padding: 64px 0 28px;
+}
+.footer-grid {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr 1fr 1fr;
+  gap: 40px;
+}
+.site-footer .logo { color: #fff; margin-bottom: 14px; }
+.site-footer h4 {
+  color: #fff;
+  font-size: .82rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+.site-footer ul { list-style: none; margin: 0; padding: 0; }
+.site-footer li { margin-bottom: 10px; font-size: .95rem; }
+.site-footer a:hover { color: #fff; }
+.footer-bottom {
+  margin-top: 48px;
+  padding-top: 22px;
+  border-top: 1px solid rgba(255, 255, 255, .12);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: .88rem;
+}
+
+/* ---------- reveal on scroll ---------- */
+
+.reveal {
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity .5s ease, transform .5s ease;
+}
+.reveal.is-visible { opacity: 1; transform: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+  .reveal { opacity: 1; transform: none; }
+  /* the stack's depth cues come from a scroll listener main.js never binds
+     under reduced motion; unpin the slides so they read as plain sections */
+  .sl { position: relative; height: auto; min-height: 0; padding: 64px 0; }
+  html { scroll-behavior: auto; }
+}
+
+/* ---------- responsive ---------- */
+
+@media (max-width: 980px) {
+  .grid-4 { grid-template-columns: repeat(2, 1fr); }
+  .band-grid { grid-template-columns: 1fr; }
+  .footer-grid { grid-template-columns: 1fr 1fr; }
+  .contact-grid { grid-template-columns: 1fr; gap: 40px; }
+}
+
+@media (max-width: 760px) {
+  .section { padding: 64px 0; }
+  .nav-toggle { display: block; }
+  .nav {
+    position: absolute;
+    inset: 74px 0 auto;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    background: #fff;
+    border-bottom: 1px solid var(--line);
+    padding: 8px 24px 20px;
+    display: none;
+  }
+  .nav.is-open { display: flex; }
+  .nav a { padding: 12px 0; border-bottom: 1px solid var(--line); }
+  .nav .btn { margin-top: 14px; justify-content: center; border-bottom: 0; }
+  .grid-2, .grid-3 { grid-template-columns: 1fr; }
+  .cta { padding: 40px 24px; }
+}
+
+@media (max-width: 520px) {
+  .grid-4 { grid-template-columns: 1fr; }
+  .footer-grid { grid-template-columns: 1fr; }
+}
