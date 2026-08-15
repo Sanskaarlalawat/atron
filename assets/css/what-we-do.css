@@ -131,7 +131,7 @@
   border-radius: 16px;
   overflow: hidden;
   background: #ffffff;
-  font-family: 'Inter Tight', system-ui, sans-serif;
+  font-family: var(--font);
 }
 
 /* ============ CARD 1 — Simplify technology ============ */
@@ -167,7 +167,7 @@
 .wwd .tB .arc { position: absolute; right: -70px; top: -70px; width: 230px; height: 230px; border-radius: 50%; border: 1px solid rgba(30,80,200,0.09); }
 .wwd .tB .arc.a2 { right: -36px; top: -36px; width: 160px; height: 160px; }
 .wwd .tB .wwd-eyebrow { position: absolute; left: 28px; top: 28px; font-family: 'Geist Mono', monospace; font-size: 13px; font-weight: 600; color: #1e1e1e; letter-spacing: 0.01em; }
-.wwd .tB .heading { position: absolute; left: 28px; right: 40px; top: 58px; font-family: 'Inter Tight', sans-serif; font-size: 23px; font-weight: 600; line-height: 1.3; letter-spacing: -0.01em; }
+.wwd .tB .heading { position: absolute; left: 28px; right: 40px; top: 58px; font-family: var(--font); font-size: 23px; font-weight: 600; line-height: 1.3; letter-spacing: -0.01em; }
 .wwd .tB .heading b { color: #1c1c1e; font-weight: 600; }
 .wwd .tB .heading i { color: #a3a7b0; font-weight: 500; font-style: normal; }
 .wwd .tB .wwd-hero { position: absolute; left: 0; right: 0; top: 190px; bottom: 0; overflow: hidden; }
@@ -177,7 +177,7 @@
 .wwd .tC .glow { position: absolute; right: -100px; top: -60px; width: 420px; height: 420px; border-radius: 50%; filter: blur(6px); }
 .wwd .tC .msgcard { position: absolute; left: 28px; width: 322px; top: 32px; background: #fff; border-radius: 16px; padding: 16px 18px; }
 .wwd .tC .msg-head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-.wwd .tC .avatar { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 11px; font-weight: 700; font-family: 'Inter Tight', sans-serif; flex: 0 0 auto; }
+.wwd .tC .avatar { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 11px; font-weight: 700; font-family: var(--font); flex: 0 0 auto; }
 .wwd .tC .who { font-size: 13px; font-weight: 600; color: #1e1e1e; }
 .wwd .tC .who span { font-weight: 500; color: rgba(30,30,30,0.45); }
 .wwd .tC .when { margin-left: auto; font-size: 11px; color: rgba(30,30,30,0.4); }
