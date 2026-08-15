@@ -19,7 +19,13 @@ services:
         name: Cache-Control
         value: public, max-age=0, must-revalidate
     routes:
-      # /about -> /about.html, so the site can be linked without extensions
+      # Defining ANY routes replaces Render's built-in "/ serves index.html"
+      # behaviour, so the root has to be declared explicitly or it 404s while
+      # every other path still works. This rule must stay first.
+      - type: rewrite
+        source: /
+        destination: /index.html
+      # /careers -> /careers.html, so pages can be linked without extensions
       - type: rewrite
         source: /careers
         destination: /careers.html
