@@ -4,8 +4,8 @@
     {
       "name": "atcon",
       "runtimeExecutable": "python3",
-      "runtimeArgs": ["-m", "http.server", "8057"],
-      "port": 8057
+      "runtimeArgs": ["-m", "http.server", "8130"],
+      "port": 8130
     }
   ]
 }

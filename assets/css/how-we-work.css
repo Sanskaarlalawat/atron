@@ -1,0 +1,485 @@
+/* ============================================================
+   How We Work — 1:1 replica of the Figma frame (1440 x 962).
+
+   The whole section is an absolutely-positioned stage. Every
+   Figma pixel is written as calc(N * var(--px)), where --px is
+   1/1440th of the container width, so the layout scales without
+   any of the coordinates drifting.
+   ============================================================ */
+
+.hww {
+  position: relative;
+  background: #eeeeee;
+  padding: 0;
+  /* scroll runway for the pin below — see "pinned scroll reveal" further down */
+  height: 340vh;
+}
+
+.hww__pin {
+  position: sticky;
+  top: var(--header-h);
+  height: calc(100vh - var(--header-h));
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  /* The material lives here, not on .hww__stage. The stage has to stay capped
+     to the design's aspect or the cards clip, which used to leave the bare
+     page showing either side of it as grey bands. Painting the ground on the
+     pin instead means the whole viewport is the section — the stage just sits
+     inside it, and there is no edge to see. */
+  background:
+    linear-gradient(107deg, rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0.28) 26%, rgba(255, 255, 255, 0) 44%),
+    radial-gradient(95% 70% at 6% -14%, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0) 52%),
+    radial-gradient(80% 60% at 96% 104%, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0) 58%),
+    #eeeeee;
+}
+
+.hww__frame {
+  container-type: inline-size;
+  /* The stage is a fixed 1440x962 (1.497:1) and sizes everything inside it off
+     its own width. Left at 100% it grows taller than the pinned area on a
+     short, wide window, and .hww__pin's overflow:hidden then slices the top
+     and bottom off the diagram.
+
+     The cap is computed against 885 design units, not the frame's full 962.
+     Fitting all 962 leaves the diagram noticeably small on a wide window,
+     because the top and bottom of the Figma frame are empty decorative bands
+     (rules and tick marks) that nobody misses. Sizing to the content band
+     instead lets the artwork run ~15% larger and pushes the small overflow
+     into those margins, where .hww__pin crops it harmlessly — the cards
+     themselves stay fully on screen. 1440/885 = 1.63. */
+  width: min(100%, calc((100vh - var(--header-h)) * 1.63));
+  margin-inline: auto;
+}
+
+.hww__stage {
+  --px: calc(100cqw / 1440);
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  /* Tighter perspective than the usual 1400px+ — the cards are only ~250px
+     wide, so a distant camera flattens the fold into what looks like a plain
+     scale. The vanishing point sits on the centre line (975.2/1440) rather
+     than the stage centre, so every card turns as though hinged to the
+     timeline itself. Neither has any effect at rest: once --reveal hits 1 the
+     transform collapses back to the plain 2D shear matrix. */
+  perspective: 1000px;
+  perspective-origin: 67.7% 50%;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* ---------- pinned scroll reveal ----------
+   main.js turns the scroll distance through .hww into a 0-1 progress value:
+   .hww-centerline scales in from the top, and every .hww-step-group exposes
+   that as two custom properties its own plate/connector/card/node read from
+   — --dot for the quick node+connector flick, --reveal for the slower 3D card
+   pop — so JS only ever touches the one group wrapper per step, never four
+   elements. Default is fully visible; JS adds .is-scrubbable right before it
+   starts painting, so a no-JS visitor (or one under 900px, or reduced motion)
+   still gets the complete, static section rather than a permanently-collapsed
+   one. */
+.hww-step-group { --reveal: 1; --dot: 1; --fade: 1; }
+.hww.is-scrubbable .hww-step-group { --reveal: 0; --dot: 0; --fade: 0; }
+
+.hww-centerline { transform-origin: top; transform: scaleY(1); }
+.hww.is-scrubbable .hww-centerline { transform: scaleY(0); }
+
+/* ---------- decorative backdrop: rules, hatch strips, diamonds ---------- */
+
+/* The frame decoration breaks out of the stage to span the whole viewport.
+   The stage itself has to stay capped to the design's aspect or the cards
+   clip, but the rules, hatch strips and corner ticks are just a border — they
+   can stretch to the edges and make the section read as full-width. Their x
+   coordinates are percentages for exactly this reason; the cards' are not. */
+.hww-backdrop {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 100vw;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.hww-backdrop__rule {
+  position: absolute;
+  background: #d1d1d1;
+}
+
+.hww-backdrop__hatch {
+  position: absolute;
+  background: repeating-linear-gradient(
+    45deg,
+    rgba(0, 0, 0, 0.05) 0,
+    rgba(0, 0, 0, 0.05) 1px,
+    transparent 1px,
+    transparent 5px
+  );
+}
+
+.hww-backdrop__diamond {
+  position: absolute;
+  background: #ffffff;
+  border: 1px solid #d1d1d1;
+  transform: rotate(45deg);
+}
+
+/* ---------- centre timeline ---------- */
+
+.hww-centerline {
+  position: absolute;
+  width: 1px;
+  background: linear-gradient(
+    180deg,
+    #d1d1d1 0%,
+    #d1d1d1 37%,
+    #689f38 42%,
+    #d1d1d1 47%,
+    #d1d1d1 100%
+  );
+}
+
+.hww-node {
+  position: absolute;
+  border-radius: 50%;
+  box-shadow:
+    0 1px 1px rgba(0, 0, 0, 0.09),
+    0 2px 1px rgba(0, 0, 0, 0.05),
+    0 3px 1px rgba(0, 0, 0, 0.01);
+}
+
+.hww-connector {
+  position: absolute;
+  height: 1px;
+  transform-origin: 0 0;
+}
+
+/* ---------- left column copy ---------- */
+
+.hww-copy {
+  position: absolute;
+}
+
+.hww-badge {
+  display: inline-flex;
+  align-items: center;
+  background: #ffffff;
+  border: 1px solid #f0f0f0;
+  box-sizing: border-box;
+}
+
+.hww-badge__label {
+  color: rgba(33, 28, 28, 0.8);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+
+.hww-badge__pill {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.05);
+  color: #2b2525;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  box-sizing: border-box;
+}
+
+.hww-badge__chevronBox {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hww-badge__chevron {
+  width: 45%;
+  height: 60%;
+  color: #2b2525;
+}
+
+.hww-headline {
+  margin: 0;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  background: linear-gradient(180deg, #333333 0%, #000000 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.hww-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+  color: #ffffff;
+  font-family: inherit;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  background:
+    radial-gradient(140% 140% at 50% -20%, rgba(67, 70, 82, 1) 0%, rgba(28, 29, 34, 1) 100%),
+    #17171c;
+  box-shadow:
+    inset 0 1px 1px 1px rgba(255, 255, 255, 0.2),
+    inset 0 -1px 0.5px rgba(0, 0, 0, 0.04),
+    0 0 0 1px rgba(0, 0, 0, 0.08),
+    0 1px 1px -0.5px rgba(27, 27, 27, 0.12),
+    0 2px 2px -1px rgba(27, 27, 27, 0.12),
+    0 4px 4px -2px rgba(27, 27, 27, 0.12),
+    0 8px 8px -2px rgba(27, 27, 27, 0.12),
+    0 16px 16px -8px rgba(27, 27, 27, 0.12),
+    0 32px 32px -12px rgba(27, 27, 27, 0.12);
+  transition: filter 0.15s ease;
+}
+
+.hww-cta:hover {
+  filter: brightness(1.15);
+}
+
+.hww-para {
+  position: absolute;
+  margin: 0;
+  color: rgba(0, 0, 0, 0.5);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+}
+
+/* ---------- the hatched plate behind each card ---------- */
+
+.hww-plate {
+  position: absolute;
+  transform-origin: 0 0;
+  overflow: hidden;
+}
+
+.hww-plate__hatch,
+.hww-plate__wash {
+  position: absolute;
+  inset: 0;
+}
+
+.hww-plate__hatch {
+  opacity: 0.4;
+  background: repeating-linear-gradient(
+    45deg,
+    rgba(0, 0, 0, 0.15) 0,
+    rgba(0, 0, 0, 0.15) 1px,
+    transparent 1px,
+    transparent 5px
+  );
+}
+
+.hww-plate__wash {
+  opacity: 0.2;
+}
+
+/* ---------- cards ---------- */
+
+.hww-card {
+  position: absolute;
+  transform-origin: 0 0;
+  overflow: hidden;
+  color: #ffffff;
+  /* the card's own box-shadow deepens as it settles, so it reads as lifting
+     off the plate rather than just fading in flat. Clamped because --reveal
+     overshoots past 1 on the spring and a shadow shouldn't overshoot with it. */
+  box-shadow:
+    0 calc(clamp(0, var(--reveal, 1), 1) * 22px)
+      calc(clamp(0, var(--reveal, 1), 1) * 34px) -16px
+      rgba(15, 23, 42, calc(clamp(0, var(--reveal, 1), 1) * 0.35));
+  /* the card is opaque, so its reverse side is never meant to be seen — without
+     this the turn briefly shows a mirrored face as it crosses edge-on */
+  backface-visibility: hidden;
+  will-change: transform;
+}
+
+.hww-card__icon {
+  position: absolute;
+  overflow: visible;
+  /* icon materialises after the card has mostly unfolded, not in lockstep —
+     a beat of lag is what sells "the card landed, then the icon caught up".
+     --i is that shifted, renormalised slice of --reveal, named once so the
+     opacity and the drift cannot fall out of step with each other.
+     The drift is 2D on purpose: .hww-card sets overflow:hidden to crop the
+     icon, and an overflow other than visible forces transform-style back to
+     flat, so a translateZ here would be silently dropped. */
+  --i: clamp(0, calc((var(--reveal, 1) - 0.4) / 0.5), 1);
+  opacity: calc(0.6 * var(--i));
+  transform:
+    translate3d(calc((1 - var(--i)) * 16px), calc((1 - var(--i)) * -14px), 0)
+    scale(calc(0.72 + var(--i) * 0.28));
+  transform-origin: 100% 0%;
+}
+
+.hww-card__corner {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.hww-card__step {
+  position: absolute;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: #ffffff;
+  /* the label leads the copy — it is the first thing to settle once the panel
+     is solid, so the eye is given the step number before the description */
+  --s: clamp(0, calc((var(--reveal, 1) - 0.2) / 0.5), 1);
+  opacity: var(--s);
+  transform: translate3d(calc((1 - var(--s)) * -10px), 0, 0);
+}
+
+.hww-card__block {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  /* title + description settle up into place a touch after the fold itself,
+     so the copy reads as arriving rather than being glued to the panel */
+  --b: clamp(0, calc((var(--reveal, 1) - 0.3) / 0.6), 1);
+  opacity: var(--b);
+  transform: translate3d(0, calc((1 - var(--b)) * 16px), 0);
+}
+
+.hww-card__title {
+  font-weight: 500;
+  color: #ffffff;
+  white-space: nowrap;
+}
+
+.hww-card__desc {
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* ============================================================
+   Stacked fallback — the Figma frame is desktop-only, so below
+   900px we drop the shear and lay the cards out in one column.
+   ============================================================ */
+
+.hww__stack {
+  display: none;
+}
+
+@media (max-width: 899px) {
+  .hww {
+    height: auto;
+  }
+
+  .hww__pin {
+    position: static;
+    height: auto;
+    display: block;
+  }
+
+  .hww__stage {
+    display: none;
+  }
+
+  .hww__stack {
+    display: block;
+    padding: 48px 20px 64px;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+
+  .hww-badge--flow {
+    height: 37px;
+    padding: 0 2px 0 14px;
+    gap: 12px;
+    border-radius: 100px;
+    font-size: 14px;
+  }
+
+  .hww-badge--flow .hww-badge__pill {
+    height: 33px;
+    padding: 6px 4px 6px 10px;
+    border-radius: 100px;
+    font-size: 14px;
+  }
+
+  .hww-badge--flow .hww-badge__chevronBox {
+    width: 15px;
+    height: 15px;
+  }
+
+  .hww-headline--flow {
+    margin: 20px 0 0;
+    font-size: clamp(30px, 8vw, 44px);
+    line-height: 1.15;
+  }
+
+  .hww-cta--flow {
+    margin-top: 24px;
+    height: 47px;
+    padding: 0 21px;
+    border-radius: 10px;
+    font-size: 15px;
+  }
+
+  .hww-para--flow {
+    position: static;
+    margin: 20px 0 0;
+    max-width: 420px;
+    font-size: 17px;
+    line-height: 1.5;
+  }
+
+  .hww__stackCards {
+    display: grid;
+    gap: 16px;
+    margin-top: 36px;
+  }
+
+  .hww-flowCard {
+    position: relative;
+    overflow: hidden;
+    border-radius: 12px;
+    padding: 18px 20px 22px;
+    min-height: 180px;
+    display: flex;
+    flex-direction: column;
+    color: #ffffff;
+  }
+
+  .hww-flowCard__icon {
+    position: absolute;
+    top: -4px;
+    right: -8px;
+    width: 120px;
+    height: 96px;
+    opacity: 0.6;
+  }
+
+  .hww-flowCard__step {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    margin-bottom: auto;
+  }
+
+  .hww-flowCard__title {
+    margin: 48px 0 2px;
+    font-size: 18px;
+    font-weight: 500;
+  }
+
+  .hww-flowCard__desc {
+    margin: 0;
+    max-width: 80%;
+    font-size: 12px;
+    line-height: 1.4;
+    letter-spacing: -0.01em;
+    color: rgba(255, 255, 255, 0.7);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hww { height: auto; }
+  .hww__pin { position: static; height: auto; display: block; }
+  .hww-step-group,
+  .hww.is-scrubbable .hww-step-group { --reveal: 1 !important; --dot: 1 !important; --fade: 1 !important; }
+  .hww-centerline,
+  .hww.is-scrubbable .hww-centerline { transform: scaleY(1) !important; }
+}

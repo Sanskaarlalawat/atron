@@ -11,7 +11,7 @@
 
 <header class="site-header">
   <div class="container">
-    <a class="logo" href="index.html"><span class="logo-mark"></span>ATCON</a>
+    <a class="logo" href="index.html" aria-label="ATCON"><span class="logo-mark"></span></a>
     <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">☰</button>
     <nav class="nav">
       <a href="index.html">Home</a>
@@ -103,42 +103,76 @@
 
 <footer class="site-footer">
   <div class="container">
-    <div class="footer-grid">
-      <div>
-        <a class="logo" href="index.html"><span class="logo-mark"></span>ATCON</a>
-        <p>A trusted tech partner for business-led innovation.</p>
+    <div class="footer-top">
+      <div class="footer-cta">
+        <p class="footer-eyebrow">Let&rsquo;s build your digital future</p>
+        <h2 class="footer-head">Do you have any questions?</h2>
+        <a class="footer-btn" href="contact.html">Coffee&rsquo;s on us, let&rsquo;s talk</a>
       </div>
-      <div>
-        <h4>Company</h4>
-        <ul>
-          <li><a href="index.html">Home</a></li>
-          <li><a href="insights.html">Insights</a></li>
-          <li><a href="careers.html">Careers</a></li>
-          <li><a href="contact.html">Contact</a></li>
-        </ul>
-      </div>
-      <div>
-        <h4>Services</h4>
-        <ul>
-          <li><a href="index.html#services">Simplify technology</a></li>
-          <li><a href="index.html#services">Data intelligence</a></li>
-          <li><a href="index.html#services">Automation</a></li>
-          <li><a href="index.html#services">Applied AI</a></li>
-        </ul>
-      </div>
-      <div>
-        <h4>Contact</h4>
-        <ul>
-          <li>Avenue Louise 523<br>1050 Brussels, Belgium</li>
-          <li><a href="tel:+32470204512">+32 470 20 45 12</a></li>
-          <li><a href="mailto:connect@atconglobal.com">connect@atconglobal.com</a></li>
-        </ul>
+
+      <div class="footer-info">
+        <div class="footer-field footer-field--wide">
+          <span class="footer-label">Address</span>
+          <span class="footer-value">Brussels, Belgium</span>
+          <span class="footer-sub">Avenue Louise 523, 1050 Brussels, Belgium</span>
+        </div>
+        <div class="footer-pair">
+          <div class="footer-field">
+            <span class="footer-label">Contact Number</span>
+            <a class="footer-value" href="tel:+32470204512">+32 470 20 45 12</a>
+          </div>
+          <div class="footer-field">
+            <span class="footer-label">Email</span>
+            <a class="footer-value" href="mailto:connect@atconglobal.com">connect@atconglobal.com</a>
+          </div>
+        </div>
+        <nav class="footer-nav" aria-label="Footer">
+          <a href="index.html" aria-current="page">Home</a>
+          <a href="insights.html">Insights</a>
+          <a href="careers.html">Career</a>
+          <a href="contact.html">Contact us</a>
+          <a href="#">Privacy &amp; Cookies</a>
+        </nav>
       </div>
     </div>
-    <div class="footer-bottom">
-      <span>© <span data-year>2026</span> ATCON. All rights reserved.</span>
-      <span><a href="#">Privacy policy</a> · <a href="#">Terms</a></span>
+  </div>
+
+    <div class="container">
+      <div class="footer-legal">
+        <span>&copy; <span data-year>2026</span> ATCON. All rights reserved.</span>
+        <span>Brussels &middot; Belgium</span>
+      </div>
     </div>
+
+  <!-- Liquid ripple filter for the wordmark. feTurbulence generates a noise
+       field; feDisplacementMap then pushes each pixel of the mark sideways by
+       the amount that noise says — which is what makes the letters wobble like
+       something seen through moving water. The <animate> drifts the noise so
+       the surface is never still; main.js only tweens `scale`, the intensity,
+       which sits at 0 until the pointer is over it. -->
+  <svg width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute">
+    <filter id="footer-liquid" x="-12%" y="-12%" width="124%" height="124%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.005 0.011" numOctaves="3" seed="7" result="noise">
+        <animate attributeName="baseFrequency" dur="16s" repeatCount="indefinite"
+                 values="0.005 0.011;0.009 0.006;0.005 0.011"/>
+      </feTurbulence>
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="17"
+                         xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+  </svg>
+
+  <!-- Oversized wordmark, cropped by the footer's bottom edge. The blur is
+       progressive left-to-right: five stacked copies of the same mark, each
+       blurrier than the last, each revealed by its own gradient mask further
+       to the right. A single filter cannot ramp across an element, so layering
+       masked copies is the way to fake a gradient blur. -->
+  <div class="footer-mark" data-liquid aria-hidden="true">
+    <span class="footer-mark__layer" style="--b:0px;   --from:0%;  --to:24%"></span>
+    <span class="footer-mark__layer" style="--b:4px;   --from:26%; --to:46%"></span>
+    <span class="footer-mark__layer" style="--b:11px;  --from:44%; --to:64%"></span>
+    <span class="footer-mark__layer" style="--b:22px;  --from:62%; --to:82%"></span>
+    <span class="footer-mark__layer" style="--b:38px;  --from:78%; --to:100%"></span>
+    <span class="footer-mark__wet"><i class="footer-mark__wetInk"></i></span>
   </div>
 </footer>
 

@@ -1,0 +1,222 @@
+/* ============================================================
+   What we do — six cards on a scroll-driven spiral.
+
+   Two halves:
+     1. the card artwork, ported from the supplied standalone file
+     2. the spiral stage that flies them past the camera
+
+   Everything is scoped under .wwd. Four of the original class
+   names (.card, .hero, .eyebrow, .grid) already exist in
+   styles.css, so those are renamed rather than merely scoped —
+   the site's .eyebrow in particular would otherwise force
+   uppercase and letterspacing onto the card labels, which
+   scoping alone cannot undo for properties the card CSS never
+   sets. The rest keep their original names.
+   ============================================================ */
+
+/* ---------- stage ---------- */
+
+/* No overflow:hidden here, however much the spiral wants clipping — an
+   overflow other than visible makes this a scroll container, and a scroll
+   container silently stops position:sticky working for anything inside it.
+   The clipping belongs on .wwd__pin, which is inside the sticky element
+   rather than around it. */
+.wwd {
+  position: relative;
+  background: var(--bg);
+}
+.wwd__head { position: relative; z-index: 4; padding-top: 64px; }
+/* In spiral mode the heading becomes compact top chrome that the cards fly
+   beneath, rather than a full section head that would fight them for the
+   middle of the stage. */
+.wwd.is-spiral .wwd__head { padding-top: 18px; text-align: center; }
+.wwd.is-spiral .wwd__head .section-head { max-width: none; margin-bottom: 0; }
+.wwd.is-spiral .wwd__head h2 {
+  font-size: clamp(1.5rem, 2.2vw, 1.9rem);
+  margin: 0;
+}
+.wwd.is-spiral .wwd__head .eyebrow { margin-bottom: 6px; }
+.wwd__track {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 412px));
+  gap: 32px;
+  justify-content: center;
+  padding: 48px 24px 88px;
+}
+
+/* Spiral mode is opt-in: main.js adds .is-spiral only on a wide enough
+   viewport with motion allowed. Without it the block above stands as a plain
+   responsive grid, so no-JS and reduced-motion visitors get every card. */
+.wwd.is-spiral { height: 430vh; }
+.wwd.is-spiral .wwd__pin {
+  position: sticky;
+  top: var(--header-h);
+  height: calc(100vh - var(--header-h));
+  overflow: hidden;
+  /* The fade lives here rather than on .wwd__track because the track is the
+     perspective parent: an opacity below 1 on that element would flatten its
+     3D rendering context and collapse the cards' depth sorting. .wwd__pin sits
+     outside that context, so it can fade the whole scene safely. */
+  opacity: var(--stage-o, 1);
+}
+/* The lift and settle. Applied to the two content layers, not to the sticky
+   element, so the scene eases into place without disturbing the pinning. */
+.wwd.is-spiral .wwd__head,
+.wwd.is-spiral .wwd__track {
+  transform: translate3d(0, var(--stage-y, 0px), 0) scale(var(--stage-s, 1));
+}
+.wwd.is-spiral .wwd__track {
+  position: absolute;
+  inset: 0;
+  display: block;
+  padding: 0;
+  /* The camera is deliberately close. A far perspective flattens the helix
+     into a flat carousel — it is this value that makes the incoming cards
+     genuinely shrink into the distance rather than merely scale down. */
+  perspective: 1100px;
+  perspective-origin: 50% 46%;
+  /* explicit, so the cards depth-sort against each other: without it siblings
+     paint in DOM order and a card behind the focal one can draw over it */
+  transform-style: preserve-3d;
+}
+/* Each card is centred, then flown to its point on the helix by the six
+   custom properties main.js writes. Keeping the maths in JS and the painting
+   in CSS means the browser only ever animates a transform. */
+.wwd.is-spiral .wwd-card {
+  position: absolute;
+  left: 50%;
+  /* Dropped well below dead centre to open a clear band between the heading
+     and the focal card. The pin clips at its bottom edge, so this trades room
+     under the card — which only the fading, departing cards occupy — for
+     breathing space above it, where the heading is. */
+  top: calc(50% + 84px);
+  margin: -246px 0 0 -206px;
+  transform:
+    translate3d(var(--x, 0px), var(--y, 0px), var(--z, 0px))
+    rotateY(var(--ry, 0deg))
+    rotateX(var(--rx, 0deg))
+    rotateZ(var(--rz, 0deg));
+  opacity: var(--o, 1);
+  /* Depth of field. Only the card at the focal point is sharp; the ones
+     arriving and departing soften off, which is the cue the eye actually reads
+     as "further away" — faster and more convincingly than scale alone. */
+  filter: blur(var(--blur, 0px));
+  will-change: transform, opacity, filter;
+  backface-visibility: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wwd.is-spiral { height: auto; }
+  .wwd.is-spiral .wwd__pin { position: static; height: auto; overflow: visible; }
+  .wwd.is-spiral .wwd__track {
+    position: static;
+    display: grid;
+    padding: 48px 24px 88px;
+    perspective: none;
+  }
+  .wwd.is-spiral .wwd-card {
+    position: relative;
+    left: auto; top: auto; margin: 0;
+    transform: none;
+    opacity: 1;
+  }
+}
+
+/* ---------- shared card shell ---------- */
+
+.wwd .wwd-card {
+  position: relative;
+  width: 412px;
+  height: 492px;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #ffffff;
+  font-family: 'Inter Tight', system-ui, sans-serif;
+}
+
+/* ============ CARD 1 — Simplify technology ============ */
+.wwd .c1 {
+  background: radial-gradient(135% 92% at 50% -8%, #2f6ef6 0%, #3f78f6 26%, rgba(63,120,246,0.42) 52%, rgba(255,255,255,0) 78%), #ffffff;
+  box-shadow: inset 0 0 0 5px #ffffff, 0 4px 9px rgba(26,103,231,0.10), 0 16px 16px rgba(26,103,231,0.09), 0 37px 22px rgba(26,103,231,0.05), 0 65px 26px rgba(26,103,231,0.01), 0 1px 1px rgba(0,0,0,0.15), 0 3px 3px rgba(0,0,0,0.05);
+}
+.wwd .c1 .ring { position: absolute; left: 206px; top: 190px; transform: translate(-50%,-50%); border-radius: 50%; border: 1px solid rgba(255,255,255,0.14); }
+.wwd .c1 .ring.r1 { width: 392px; height: 392px; border-color: rgba(255,255,255,0.10); }
+.wwd .c1 .ring.r2 { width: 300px; height: 300px; border-color: rgba(255,255,255,0.14); }
+.wwd .c1 .ring.r3 { width: 214px; height: 214px; border-color: rgba(255,255,255,0.18); }
+.wwd .c1 .glow { position: absolute; left: 206px; top: 190px; width: 300px; height: 300px; transform: translate(-50%,-50%); border-radius: 50%; background: radial-gradient(circle, rgba(150,190,255,0.55) 0%, rgba(60,130,255,0.30) 45%, rgba(34,101,244,0) 72%); filter: blur(14px); }
+.wwd .c1 .chip { position: absolute; width: 40px; height: 40px; border-radius: 11px; background: rgba(255,255,255,0.16); border: 1px solid rgba(255,255,255,0.45); backdrop-filter: blur(6px); display: flex; align-items: center; justify-content: center; color: #fff; font-family: 'Geist Mono', monospace; font-size: 15px; font-weight: 500; box-shadow: 0 6px 14px rgba(20,60,160,0.20); }
+.wwd .c1 .chip.c1a { left: 60px;  top: 96px; }
+.wwd .c1 .chip.c2a { left: 312px; top: 104px; }
+.wwd .c1 .chip.c3a { left: 70px; top: 214px; }
+.wwd .c1 .core-ring { position: absolute; left: 206px; top: 190px; width: 150px; height: 150px; transform: translate(-50%,-50%); border-radius: 50%; background: rgba(255,255,255,0.14); border: 1px solid rgba(255,255,255,0.55); box-shadow: inset 0 1px 8px rgba(255,255,255,0.35); }
+.wwd .c1 .core { position: absolute; left: 206px; top: 190px; width: 98px; height: 98px; transform: translate(-50%,-50%); border-radius: 50%; background: linear-gradient(180deg,#ffffff 0%,#eef3ff 100%); display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 24px rgba(20,60,160,0.28), 0 2px 6px rgba(20,60,160,0.18), inset 0 2px 3px rgba(255,255,255,0.9); }
+.wwd .c1 .core .cmd { font-family: 'Inter', system-ui, sans-serif; font-size: 42px; font-weight: 500; line-height: 1; background: linear-gradient(160deg,#3f7bff 0%,#4b44f6 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.wwd .c1 .index { position: absolute; left: 24px; top: 24px; font-family: 'Geist Mono', monospace; font-weight: 700; font-size: 18px; letter-spacing: -0.02em; color: #ffffff; }
+.wwd .c1 .badge { position: absolute; right: 24px; top: 22px; width: 34px; height: 34px; border-radius: 8px; background: #fff; display: flex; align-items: center; justify-content: center; color: #1e1e1e; font-size: 18px; box-shadow: 0 2px 5px rgba(15,40,90,0.16), 0 8px 16px rgba(15,40,90,0.06); }
+.wwd .c1 .toast { position: absolute; left: 40px; top: 292px; width: 332px; border-radius: 18px; padding: 5px; background: linear-gradient(180deg, rgba(255,255,255,0.55), rgba(210,225,255,0.35)); border: 1px solid rgba(255,255,255,0.6); box-shadow: 0 18px 30px rgba(11,28,74,0.10); backdrop-filter: blur(4px); }
+.wwd .c1 .toast-inner { display: flex; align-items: center; gap: 12px; background: #ffffff; border-radius: 14px; padding: 12px 14px; box-shadow: 0 12px 24px -12px rgba(11,28,74,0.12), 0 0 0 1px rgba(3,71,255,0.04); }
+.wwd .c1 .toast-icon { flex: 0 0 auto; width: 34px; height: 34px; border-radius: 9px; background: linear-gradient(180deg,#3f7bff,#2f62f0); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 17px; box-shadow: 0 4px 10px rgba(20,60,160,0.30); }
+.wwd .c1 .toast-title { font-size: 14px; font-weight: 600; color: #17181b; letter-spacing: -0.01em; }
+.wwd .c1 .toast-sub { font-size: 12.5px; color: rgba(23,24,27,0.55); margin-top: 1px; }
+.wwd .c1 .cap { position: absolute; left: 26px; right: 26px; bottom: 26px; }
+.wwd .c1 .cap-title { font-size: 17px; font-weight: 600; letter-spacing: -0.01em; color: #1e1e1e; margin-bottom: 4px; }
+.wwd .c1 .cap-desc { font-size: 14px; font-weight: 500; letter-spacing: -0.01em; line-height: 1.45; color: rgba(30,30,30,0.58); }
+
+/* ============ TEMPLATE B — label + heading top, art bleeding to the bottom ============ */
+.wwd .tB { background: #f4f7fd; box-shadow: 0 4px 9px rgba(20,40,90,0.05), 0 24px 30px rgba(20,40,90,0.06), 0 1px 1px rgba(0,0,0,0.08); }
+.wwd .tB .arc { position: absolute; right: -70px; top: -70px; width: 230px; height: 230px; border-radius: 50%; border: 1px solid rgba(30,80,200,0.09); }
+.wwd .tB .arc.a2 { right: -36px; top: -36px; width: 160px; height: 160px; }
+.wwd .tB .wwd-eyebrow { position: absolute; left: 28px; top: 28px; font-family: 'Geist Mono', monospace; font-size: 13px; font-weight: 600; color: #1e1e1e; letter-spacing: 0.01em; }
+.wwd .tB .heading { position: absolute; left: 28px; right: 40px; top: 58px; font-family: 'Inter Tight', sans-serif; font-size: 23px; font-weight: 600; line-height: 1.3; letter-spacing: -0.01em; }
+.wwd .tB .heading b { color: #1c1c1e; font-weight: 600; }
+.wwd .tB .heading i { color: #a3a7b0; font-weight: 500; font-style: normal; }
+.wwd .tB .wwd-hero { position: absolute; left: 0; right: 0; top: 190px; bottom: 0; overflow: hidden; }
+
+/* ============ TEMPLATE C — floating mockup + centred heading/divider/desc ============ */
+.wwd .tC { background: #ffffff; box-shadow: 0 4px 9px rgba(20,20,40,0.05), 0 24px 30px rgba(20,20,40,0.06), 0 1px 1px rgba(0,0,0,0.08); }
+.wwd .tC .glow { position: absolute; right: -100px; top: -60px; width: 420px; height: 420px; border-radius: 50%; filter: blur(6px); }
+.wwd .tC .msgcard { position: absolute; left: 28px; width: 322px; top: 32px; background: #fff; border-radius: 16px; padding: 16px 18px; }
+.wwd .tC .msg-head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.wwd .tC .avatar { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 11px; font-weight: 700; font-family: 'Inter Tight', sans-serif; flex: 0 0 auto; }
+.wwd .tC .who { font-size: 13px; font-weight: 600; color: #1e1e1e; }
+.wwd .tC .who span { font-weight: 500; color: rgba(30,30,30,0.45); }
+.wwd .tC .when { margin-left: auto; font-size: 11px; color: rgba(30,30,30,0.4); }
+.wwd .tC .msg-text { font-size: 12.5px; line-height: 1.55; color: rgba(30,30,30,0.68); }
+.wwd .tC .inputbar { position: absolute; left: 28px; width: 322px; height: 52px; background: #fff; border-radius: 26px; display: flex; align-items: center; padding: 0 6px 0 20px; }
+.wwd .tC .inputbar span { font-size: 12.5px; color: rgba(30,30,30,0.35); flex: 1; }
+.wwd .tC .send { width: 36px; height: 36px; border-radius: 50%; background: #17181b; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 15px; flex: 0 0 auto; }
+.wwd .tC .cursor { position: absolute; width: 0; height: 0; border-left: 7px solid transparent; border-right: 3px solid transparent; border-top: 11px solid #17181b; transform: rotate(-24deg); }
+.wwd .tC .centered { position: absolute; left: 26px; right: 26px; text-align: center; }
+.wwd .tC .centered .htitle { font-size: 19px; font-weight: 700; color: #1e1e1e; letter-spacing: -0.01em; }
+.wwd .tC .centered .rule { width: 42px; height: 1px; background: rgba(20,20,20,0.16); margin: 12px auto; }
+.wwd .tC .centered .hdesc { font-size: 13.5px; line-height: 1.55; color: rgba(30,30,30,0.55); max-width: 270px; margin: 0 auto; }
+
+/* ---- card 2 : Embedded partnership ---- */
+.wwd .c2 .glow { background: radial-gradient(60% 55% at 100% 35%, #8eb4ff 0%, #d3e2ff 40%, rgba(255,255,255,0) 72%); }
+.wwd .c2 .msgcard { border: 1.5px solid rgba(50,110,230,0.45); box-shadow: 0 16px 30px rgba(30,90,220,0.10); }
+.wwd .c2 .avatar { background: linear-gradient(160deg,#5c95ff,#2e62f2); }
+.wwd .c2 .inputbar { border: 1.5px solid rgba(50,110,230,0.45); box-shadow: 0 12px 22px rgba(30,90,220,0.08); }
+.wwd .c2 .cursor { border-top-color: #17181b; }
+
+/* ---- card 3 : Structure data intelligence ---- */
+.wwd .c3 .iso-label { font-family: 'Geist Mono', monospace; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; fill: #12266e; }
+.wwd .c3 .rivet { fill: #ffffff; stroke: #3f78f6; stroke-width: 1.4; }
+
+/* ---- card 4 : Scale digital systems ---- */
+.wwd .c4 .bokeh { position: absolute; left: 190px; top: 118px; width: 90px; height: 130px; border-radius: 50%; background: radial-gradient(ellipse, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0) 70%); filter: blur(2px); }
+.wwd .c4 .badge { position: absolute; width: 52px; height: 52px; border-radius: 50%; background: #ffffff; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 22px rgba(20,50,140,0.16), 0 2px 6px rgba(20,50,140,0.10); border: 2.5px solid; }
+.wwd .c4 .badge svg { width: 22px; height: 22px; }
+
+/* ---- card 5 : Automate operations — dark navy anchor card ---- */
+.wwd .c5.tB { background: radial-gradient(120% 100% at 90% -10%, #1c3a8c 0%, #10225c 45%, #0a1740 100%); box-shadow: 0 4px 9px rgba(10,20,60,0.20), 0 24px 34px rgba(10,20,60,0.28), inset 0 0 0 1px rgba(255,255,255,0.05); }
+.wwd .c5 .arc { border: 1px solid rgba(255,255,255,0.10); }
+.wwd .c5 .wwd-eyebrow { color: #a9c3ff; }
+.wwd .c5 .heading b { color: #ffffff; }
+.wwd .c5 .heading i { color: rgba(255,255,255,0.48); }
+.wwd .c5 .icon-chip { position: absolute; width: 42px; height: 42px; border-radius: 50%; background: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 16px; box-shadow: 0 10px 22px rgba(5,12,40,0.35); }
+
+/* ---- card 6 : Applied AI ---- */
+.wwd .c6 .glow { background: radial-gradient(60% 55% at 100% 35%, #6f97ff 0%, #c3d6ff 40%, rgba(255,255,255,0) 72%); }
+.wwd .c6 .msgcard { border: 1.5px solid rgba(30,79,216,0.40); box-shadow: 0 16px 30px rgba(20,60,180,0.12); }
+.wwd .c6 .avatar { background: linear-gradient(160deg,#3f78f6,#1f4fd8); }
+.wwd .c6 .inputbar { border: 1.5px solid rgba(30,79,216,0.40); box-shadow: 0 12px 22px rgba(20,60,180,0.09); }
