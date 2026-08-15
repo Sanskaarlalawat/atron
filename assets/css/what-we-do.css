@@ -32,7 +32,7 @@
 .wwd.is-spiral .wwd__head { padding-top: 18px; text-align: center; }
 .wwd.is-spiral .wwd__head .section-head { max-width: none; margin-bottom: 0; }
 .wwd.is-spiral .wwd__head h2 {
-  font-size: clamp(1.5rem, 2.2vw, 1.9rem);
+  font-size: var(--h2);
   margin: 0;
 }
 .wwd.is-spiral .wwd__head .eyebrow { margin-bottom: 6px; }

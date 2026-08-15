@@ -9,7 +9,7 @@
 
 .hww {
   position: relative;
-  background: #eeeeee;
+  background: #f7f8f9;
   padding: 0;
   /* scroll runway for the pin below — see "pinned scroll reveal" further down */
   height: 340vh;
@@ -31,7 +31,7 @@
     linear-gradient(107deg, rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0.28) 26%, rgba(255, 255, 255, 0) 44%),
     radial-gradient(95% 70% at 6% -14%, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0) 52%),
     radial-gradient(80% 60% at 96% 104%, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0) 58%),
-    #eeeeee;
+    #f7f8f9;
 }
 
 .hww__frame {
@@ -169,9 +169,14 @@
 }
 
 .hww-badge__label {
-  color: rgba(33, 28, 28, 0.8);
-  font-weight: 500;
-  letter-spacing: -0.02em;
+  /* the site's eyebrow blue, so this label reads as the section's eyebrow the
+     way every other section's does */
+  color: var(--blue);
+  /* !important: the ported markup sets font-size inline in stage units */
+  font-size: .78rem !important;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .14em;
   white-space: nowrap;
 }
 
@@ -199,13 +204,19 @@
 }
 
 .hww-headline {
+  /* the ported stage sizes everything in --px container units; the title is
+     pulled back onto the site's shared scale so it matches other sections */
+  /* both need !important: the ported markup carries inline font-size and
+     line-height in --px stage units, and an inline style outranks this file */
+  font-size: var(--h2) !important;
+  line-height: 1.15 !important;
   margin: 0;
-  font-weight: 500;
+  font-weight: 700;
   letter-spacing: -0.02em;
-  background: linear-gradient(180deg, #333333 0%, #000000 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  /* was a #333->#000 gradient clipped to the text: the top of every glyph came
+     out grey, which reads as a lighter weight however bold the face actually
+     is. Solid --ink instead, same as every other heading on the site. */
+  color: var(--ink);
 }
 
 .hww-cta {

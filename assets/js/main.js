@@ -848,6 +848,97 @@
     });
   }
 
+  /* --- our impact: lay the field out from the Figma coordinates ---
+     GROUND holds every plain tile's x/y; BLOCKS holds the six coloured ones
+     with their fills and rise. Nothing here is derived from a formula — the
+     lattice in the design is hand-placed and drifts a few px off a perfect
+     grid, so the numbers are the numbers. */
+  var impField = document.querySelector("[data-imp-field]");
+
+  if (impField) {
+    var GROUND = [
+      [1263,14],[1339,0],[1510,97],[1681,196],[1854,295],[1172,100],[1514,296],
+      [1687,395],[1004,200],[1175,296],[1519,495],[837,300],[1179,495],[1352,595],
+      [841,496],[1184,695],[502,499],[673,596],[844,695],[1017,794],[506,696],
+      [677,795],[850,894],[167,699],[338,796],[509,895],[682,994],[0,799],
+      [171,895],[342,995]
+    ];
+    // rise 77.37 is the tall block, 35.37 the short one — both straight off the
+    // gap between each tile's top and base face in the node data
+    var BLOCKS = [
+      { x:1343, y:196, rise:77.37, top:"#3D7BF7", body:"#2563EB", lip:"#1D4ED8",
+        v:"98%", l:"Client Satisfaction &amp;<br>Retention" },
+      { x:1008, y:396, rise:77.37, top:"#1F1F23", body:"#131316", lip:"#09090B",
+        v:"50+", l:"Software Projects Co<br>Delivered" },
+      { x:670,  y:399, rise:77.37, top:"#6772E5", body:"#4855E0", lip:"#3745DC",
+        v:"25+", l:"Technology Partners in<br>our Network" },
+      { x:1346, y:396, rise:35.37, top:"#1E3A6B", body:"#13254C", lip:"#0A1733",
+        v:"10+", l:"Years navigating<br>Expertise" },
+      { x:1012, y:595, rise:77.37, top:"#6E92D8", body:"#4E70B4", lip:"#3C5893" },
+      { x:515,  y:1094, rise:77.37, top:"#2A63F6", body:"#1240D8", lip:"#0E34B4" }
+    ];
+
+    var CX = 0.36 + 162.74, CY = 35.37 + 93.96;   // base-diamond centre
+    var html = "";
+
+    GROUND.forEach(function (g) {
+      html += '<div class="imp-t" style="left:' + g[0] + 'px;top:' + g[1] + 'px">' +
+        '<i class="imp-d imp-d--ground" style="left:' + CX + 'px;top:' + CY + 'px"></i>' +
+        '<i class="imp-d imp-d--inner" style="left:' + CX + 'px;top:' + CY +
+          'px;width:200px;height:200px;margin:-100px 0 0 -100px"></i>' +
+        "</div>";
+    });
+
+    /* Everything above the ground plane is authored at rest (rise 0, sitting in
+       its ground tile) and lifted by --rise. The block therefore grows OUT of
+       the tile rather than fading in above it. The lifted parts ride one
+       translated wrapper — a single GPU transform — while the two walls stretch,
+       since a wall has to get taller, not move. */
+    BLOCKS.forEach(function (b, i) {
+      var bolt = function (x, off) {
+        return '<i class="imp-bolt" style="left:' + x + 'px;top:' + (CY - 93.96 + off) + 'px"></i>';
+      };
+      html += '<div class="imp-t imp-t--up" style="left:' + b.x + 'px;top:' + b.y +
+        'px;--top:' + b.top + ';--body:' + b.body + ';--lip:' + b.lip +
+        ';--rise-max:' + b.rise + 'px;--d:' + (i * 90) + 'ms">' +
+        '<i class="imp-d imp-d--base" style="left:' + CX + 'px;top:' + CY + 'px"></i>' +
+        '<i class="imp-w imp-w--l" style="left:9.55px;top:calc(' + (CY + 4.08) + 'px - var(--rise))"></i>' +
+        '<i class="imp-w imp-w--r" style="left:181.81px;top:calc(' + (CY + 5.11) + 'px - var(--rise))"></i>' +
+        '<div class="imp-lift">' +
+          '<i class="imp-d imp-d--top" style="left:' + CX + 'px;top:' + CY + 'px"></i>' +
+          '<i class="imp-pad" style="left:' + CX + 'px;top:' + (CY - 5.01) + 'px"></i>' +
+          (b.v
+            ? '<div class="imp-c" style="left:' + CX + 'px;top:' + (CY - 5.01) +
+              'px"><b>' + b.v + "</b><span>" + b.l + "</span></div>"
+            : "") +
+          bolt(18.5, 88.54) + bolt(154.49, 9.54) + bolt(154.5, 166.54) + bolt(290.49, 87.54) +
+        "</div>" +
+        "</div>";
+    });
+
+    impField.innerHTML = html;
+
+    var impSec = document.querySelector(".imp");
+    var fitImp = function () {
+      impSec.style.setProperty("--k", (window.innerWidth / 1440).toFixed(5));
+    };
+    window.addEventListener("resize", fitImp);
+    fitImp();
+
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      impSec.classList.add("is-risen");
+    } else {
+      impSec.classList.add("is-armed");
+      new IntersectionObserver(function (entries, obs) {
+        entries.forEach(function (e) {
+          if (!e.isIntersecting) return;
+          impSec.classList.add("is-risen");
+          obs.disconnect();
+        });
+      }, { threshold: 0, rootMargin: "0px 0px -45% 0px" }).observe(impSec);
+    }
+  }
+
   /* --- CTA band: wash white out to black on approach --- */
   var ctaBand = document.querySelector("[data-cta-band]");
 

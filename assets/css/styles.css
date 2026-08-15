@@ -30,6 +30,10 @@
      reach further out on both sides without running to the edges. One value,
      so the whole site keeps a single consistent measure. */
   --max: 1320px;
+  /* One size for every section title. They had drifted to four different
+     clamps (30px in the spiral, 41.6 standard, 51.8 testimonials, 67.2 in the
+     sequence), which read as four different type scales on one page. */
+  --h2: clamp(2rem, 3.6vw, 50px);
   --font: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
     "Helvetica Neue", Arial, sans-serif;
 }
@@ -59,7 +63,7 @@ h1, h2, h3, h4 {
 }
 
 h1 { font-size: clamp(2.2rem, 5vw, 3.5rem); }
-h2 { font-size: clamp(1.8rem, 3.4vw, 2.6rem); }
+h2 { font-size: var(--h2); }
 h3 { font-size: 1.2rem; }
 
 p { margin: 0 0 1rem; }
@@ -509,12 +513,17 @@ p { margin: 0 0 1rem; }
 }
 
 /* per-case accent, taken from the client's own mark */
-.ac-blue   { --ac: #2563eb; --ac-soft: #eaf0ff; }
-.ac-teal   { --ac: #0d9488; --ac-soft: #e6f5f3; }
-.ac-violet { --ac: #7c3aed; --ac-soft: #f1eaff; }
-.ac-amber  { --ac: #d97706; --ac-soft: #fdf1e3; }
-.ac-rose   { --ac: #e11d48; --ac-soft: #ffe9ee; }
-.ac-sky    { --ac: #0284c7; --ac-soft: #e5f3fb; }
+/* Slide accents. These were six unrelated hues (teal, amber, rose...) which
+   read as six different brands once the case cards sat next to each other.
+   They are now six steps of the site's own blue-to-navy range, so the slides
+   still separate but the section belongs to the palette. Class names are kept
+   as-is: they are referenced from index.html and renaming them buys nothing. */
+.ac-blue   { --ac: #2563eb; --ac-soft: #eaf0ff; }   /* --blue        */
+.ac-sky    { --ac: #3b82f6; --ac-soft: #e9f1ff; }   /* lighter azure */
+.ac-violet { --ac: #4855e0; --ac-soft: #ecedfd; }   /* violet-blue   */
+.ac-teal   { --ac: #1d4ed8; --ac-soft: #e6ecff; }   /* --blue-dark   */
+.ac-rose   { --ac: #4e70b4; --ac-soft: #eef2fa; }   /* slate blue    */
+.ac-amber  { --ac: #13254c; --ac-soft: #e9edf5; }   /* --navy-soft   */
 
 .cs-intro { padding: 96px 0 56px; }
 
@@ -1613,9 +1622,13 @@ p { margin: 0 0 1rem; }
   box-shadow:
     0 0 0 1px rgba(20, 22, 30, .05),
     0 6px 18px rgba(20, 22, 30, .06);
-  font-size: .86rem;
-  font-weight: 600;
-  color: var(--tm-ink);
+  /* was .86rem/600/dark — brought onto the shared eyebrow spec so it reads as
+     this section's label rather than a second style of label */
+  font-size: .78rem;
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--blue);
   margin-bottom: 26px;
 }
 .tm-badge i {
@@ -1638,7 +1651,7 @@ p { margin: 0 0 1rem; }
 }
 
 .tm-title {
-  font-size: clamp(2.2rem, 3.6vw, 3.4rem);
+  font-size: var(--h2);
   line-height: 1.06;
   letter-spacing: -.04em;
   color: var(--tm-ink);
@@ -2198,7 +2211,7 @@ p { margin: 0 0 1rem; }
   margin: 0 0 34px;
   max-width: 12ch;
   font-size: clamp(2.3rem, 4.4vw, 3.9rem);
-  font-weight: 500;
+  font-weight: 700;
   line-height: 1.12;
   letter-spacing: -.02em;
   color: #fff;
@@ -2479,7 +2492,7 @@ a.footer-value:hover { color: #cfe0ff; }
 .seq__title {
   margin: 0;
   max-width: 14ch;
-  font-size: clamp(2.2rem, 5vw, 4.2rem);
+  font-size: var(--h2);
   line-height: 1.05;
   letter-spacing: -.03em;
   color: var(--ink);
@@ -2582,8 +2595,8 @@ a.footer-value:hover { color: #cfe0ff; }
 .prb.is-orbit .prb__lead    { opacity: var(--t3, 0); transform: translateY(calc(26px - var(--t3, 0) * 26px)); }
 .prb__eyebrow {
   display: block; margin-bottom: 14px;
-  font-size: .78rem; font-weight: 700; letter-spacing: .16em; text-transform: uppercase;
-  color: #7ea6ff;
+  font-size: .78rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase;
+  color: #7ea6ff;   /* lighter blue: this one sits on the black scene */
 }
 .prb__title {
   margin: 0 auto 18px;
@@ -2848,3 +2861,143 @@ a.footer-value:hover { color: #cfe0ff; }
   transform: translateY(56px);
   transition-duration: 1.1s;
 }
+
+/* ---------- our impact (Figma 400:2799) ----------
+   Built on the artboard, not a derived grid. .imp__art is the 1440x987 frame at
+   1:1 and everything inside sits at the exact node coordinate; the whole thing
+   is then scaled to the viewport, so proportions stay identical at any width.
+
+   Each face is an axis-aligned square turned into an isometric diamond by
+   `scaleY(.5774) rotate(45deg)` — rotate first, then squash, which is the order
+   that yields a diamond whose bbox is 325.48 x 187.92, exactly what Figma
+   reports. (.5774 = tan 30, the true-isometric ratio.) The two walls are plain
+   rectangles skewed 30deg; their bbox height comes out at rise + .5774*width,
+   which is why Figma's 156.03-tall wall pairs with a 77.37 rise. */
+.imp {
+  /* unitless on purpose: calc(100vw / 1440) resolves to a LENGTH (1px at
+     1440), which scale() rejects and which makes the height calc invalid.
+     main.js writes the real ratio; this is just the 1:1 fallback. */
+  --k: 1;
+  position: relative;
+  overflow: hidden;
+  height: calc(987px * var(--k));
+  background: #f7f8f9;
+}
+.imp__art {
+  position: absolute;
+  top: 0; left: 0;
+  width: 1440px; height: 987px;
+  transform-origin: 0 0;
+  transform: scale(var(--k));
+}
+/* sits above the field, indented by the site container rather than by the
+   artboard's own 74px margin */
+.imp__head {
+  position: relative;
+  z-index: 3;
+  padding-top: calc(72px * var(--k));
+}
+.imp__head .section-head h2 { max-width: 18ch; }
+.imp__sr {
+  position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap;
+}
+
+/* the tile field: frame 400:2819, offset -264 inside a frame at (30,28) */
+.imp__field { position: absolute; left: -234px; top: 28px; width: 2180px; height: 1702px; }
+.imp-t { position: absolute; width: 326px; height: 222px; }
+/* --rise is the live extrusion. Unarmed it is the full height (so the section
+   is correct with no JS); .is-armed drops it to 0 and .is-risen releases it,
+   which is what makes the blocks push up out of their ground tiles. --r is
+   never itself animated — changing it recomputes transform/top/height, and
+   those are what actually transition. */
+.imp-t--up { --r: 1; --rise: calc(var(--rise-max, 0px) * var(--r)); }
+.imp.is-armed .imp-t--up { --r: 0; }
+.imp.is-risen .imp-t--up { --r: 1; }
+
+.imp-lift {
+  position: absolute;
+  inset: 0;
+  transform: translateY(calc(-1 * var(--rise)));
+}
+.imp.is-armed .imp-lift {
+  transition: transform 2.2s cubic-bezier(.16, .74, .28, 1) var(--d, 0s);
+}
+.imp.is-armed .imp-w {
+  transition: height 2.2s cubic-bezier(.16, .74, .28, 1) var(--d, 0s),
+              top 2.2s cubic-bezier(.16, .74, .28, 1) var(--d, 0s);
+}
+
+/* a diamond: positioned by its centre so the transform can stay symmetric */
+.imp-d {
+  position: absolute;
+  width: 230.15px; height: 230.15px;
+  margin: -115.07px 0 0 -115.07px;
+  border-radius: 19.1px;
+  transform: scaleY(.5774) rotate(45deg);
+}
+.imp-d--base { background: var(--body); }
+.imp-d--top { background: var(--top); box-shadow: inset 0 0 0 1.4px rgba(255,255,255,.5); }
+/* ground tiles are the flattened light diamonds the field is made of */
+.imp-d--ground { background: #fcfcfd; box-shadow: inset 0 0 0 1.4px #e6e8ec; }
+.imp-d--inner { background: none; box-shadow: inset 0 0 0 1.4px #eceef1; }
+
+/* walls: rise-tall rectangles skewed into the two visible faces */
+.imp-w { position: absolute; width: 134.44px; height: var(--rise); background: var(--body); }
+.imp-w--l { transform-origin: 0 0; transform: skewY(30deg); }
+.imp-w--r { transform-origin: 100% 0; transform: skewY(-30deg); }
+
+/* the inset panel, with Figma's hard 6px lip */
+/* 239.27x138.14 is the pad's BOUNDING BOX, not its size. Feeding those numbers
+   straight to a rotated element skews a non-square rect and the result spills
+   out past the face. The square that projects to that box is 239.27/root2. */
+.imp-pad {
+  position: absolute;
+  width: 169.2px; height: 169.2px;
+  margin: -84.6px 0 0 -84.6px;
+  border-radius: 9.8px;
+  background: var(--body);
+  box-shadow: 0 6px 0 0 var(--lip), inset 0 0 0 1px rgba(255,255,255,.28);
+  transform: scaleY(.5774) rotate(45deg);
+}
+/* the copy is printed ON the face, so it takes the same projection the face
+   does. The sign is -45, not +45: at +45 the baseline runs up-to-the-right and
+   the lines stack down-LEFT, which mirrors the design. At -45 the lines stack
+   down-right along the face's other axis, matching Figma. translate(-50%,-50%) runs last
+   (leftmost) so it centres in the parent's space, after the distortion. */
+.imp-c {
+  position: absolute;
+  /* narrower than the pad's own 169.2 square so the enlarged type still lands
+     inside the panel once the isometric squash is applied */
+  width: 166px;
+  color: #fff;
+  text-align: center;
+  transform: translate(-50%, -50%) scaleY(.5774) rotate(-45deg);
+}
+.imp-c b { display: block; font-size: 40px; font-weight: 700; line-height: 1.08; letter-spacing: -.01em; }
+.imp-c span { display: block; margin-top: 5px; font-size: 13.5px; font-weight: 500; line-height: 1.25; }
+.imp-bolt {
+  position: absolute; width: 17.32px; height: 10px;
+  border-radius: 50%; background: #fff;
+  box-shadow: inset 2px 1px 0 0 var(--lip);
+}
+
+/* How We Work copy: pulled out of the 1440-unit stage onto the pin, so it lands
+   on the same gutter as every other section head. The stage is scaled by an
+   aspect-fit that changes with viewport HEIGHT, so any fixed offset inside it
+   drifts — this computes the container's own content edge instead. */
+.hww__pin > .hww-copy,
+.hww__pin > .hww-para {
+  position: absolute;
+  left: max(24px, calc((100% - var(--max)) / 2 + 24px)) !important;
+  z-index: 6;
+}
+.hww__pin > .hww-copy { top: 12% !important; width: min(34rem, 42%) !important; }
+.hww__pin > .hww-para { top: 76% !important; width: min(22rem, 28%) !important; }
+
+/* Hide only the four VERTICAL rules down the sides of the How We Work stage.
+   The two horizontal ones (top and bottom) stay, and so does the animated
+   .hww-centerline. They are distinguished by their inline width: the verticals
+   are 1px wide, the horizontals span 100%. */
+/* NB: the inline attribute is minified with no spaces — "width:1px" */
+.hww-backdrop__rule[style*="width:1px"] { display: none !important; }

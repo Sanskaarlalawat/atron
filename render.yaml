@@ -1,0 +1,31 @@
+# Render blueprint — this is a plain static site (no build step, no framework),
+# so it deploys as `static`: Render just serves the repo root.
+services:
+  - type: web
+    name: atcon
+    runtime: static
+    buildCommand: ""          # nothing to build; the HTML/CSS/JS ship as-is
+    staticPublishPath: .
+    pullRequestPreviewsEnabled: false
+    headers:
+      # Long-cache the fingerprinted assets. Stylesheets are requested with a
+      # ?v= query that changes whenever they do, so a stale copy can't be served.
+      - path: /assets/*
+        name: Cache-Control
+        value: public, max-age=31536000
+      # The pages themselves must always revalidate, or a cached index.html
+      # would keep pointing at an old ?v= and undo the above.
+      - path: /*.html
+        name: Cache-Control
+        value: public, max-age=0, must-revalidate
+    routes:
+      # /about -> /about.html, so the site can be linked without extensions
+      - type: rewrite
+        source: /careers
+        destination: /careers.html
+      - type: rewrite
+        source: /contact
+        destination: /contact.html
+      - type: rewrite
+        source: /insights
+        destination: /insights.html

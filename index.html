@@ -5,12 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ATCON — A trusted tech partner for business-led innovation</title>
 <meta name="description" content="ATCON helps growing companies remove complexity, automate intelligently and build digital systems that scale.">
-<link rel="stylesheet" href="assets/css/styles.css">
+<link rel="stylesheet" href="assets/css/styles.css?v=1786799595">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Inter+Tight:wght@400;500;600;700&family=Geist+Mono:wght@500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/how-we-work.css">
-<link rel="stylesheet" href="assets/css/what-we-do.css">
+<link rel="stylesheet" href="assets/css/how-we-work.css?v=1786799595">
+<link rel="stylesheet" href="assets/css/what-we-do.css?v=1786799595">
 </head>
 <body>
 
@@ -365,6 +365,21 @@
        see the "how we work: pinned 3D reveal" block in main.js. -->
   <section class="hww" id="how-we-work" data-hww-scene>
     <div class="hww__pin">
+    <!-- outside the scaled stage so it lines up with the site gutter -->
+        <div class="hww-copy" style="left:calc(150 * var(--px));top:calc(132 * var(--px));width:calc(436 * var(--px));">
+          <!-- width dropped with the pill: the badge is inline-flex, so it now
+               hugs the label instead of holding the old 228px slot open -->
+          <div class="hww-badge" style="height:calc(37 * var(--px));padding-left:calc(14 * var(--px));padding-right:calc(14 * var(--px));border-radius:calc(100 * var(--px));">
+            <span class="hww-badge__label" style="font-size:calc(14 * var(--px));line-height:calc(21 * var(--px));">How We Work</span>
+          </div>
+
+          <h2 class="hww-headline" style="margin-top:calc(12 * var(--px));font-size:calc(60 * var(--px));line-height:calc(69 * var(--px));">A partnership approach that ensures your success at every step.</h2>
+
+          <button type="button" class="hww-cta" style="margin-top:calc(32 * var(--px));width:calc(141 * var(--px));height:calc(47 * var(--px));border-radius:calc(10 * var(--px));font-size:calc(15 * var(--px));">Start a Project</button>
+        </div>
+
+        <p class="hww-para" style="left:calc(150 * var(--px));top:calc(757 * var(--px));width:calc(328 * var(--px));font-size:calc(20 * var(--px));line-height:calc(30 * var(--px));">We work as an extension of your team, from first idea to real-world results.</p>
+
     <div class="hww__frame">
       <div class="hww__stage" style="aspect-ratio: 1440 / 962;">
         <div class="hww-backdrop" aria-hidden="true">
@@ -391,19 +406,6 @@
 
         <span class="hww-centerline" data-hww-line style="left:calc(975.2 * var(--px));top:calc(62 * var(--px));height:calc(838 * var(--px));"></span>
 
-        <div class="hww-copy" style="left:calc(150 * var(--px));top:calc(132 * var(--px));width:calc(436 * var(--px));">
-          <!-- width dropped with the pill: the badge is inline-flex, so it now
-               hugs the label instead of holding the old 228px slot open -->
-          <div class="hww-badge" style="height:calc(37 * var(--px));padding-left:calc(14 * var(--px));padding-right:calc(14 * var(--px));border-radius:calc(100 * var(--px));">
-            <span class="hww-badge__label" style="font-size:calc(14 * var(--px));line-height:calc(21 * var(--px));">How We Work</span>
-          </div>
-
-          <h2 class="hww-headline" style="margin-top:calc(12 * var(--px));font-size:calc(60 * var(--px));line-height:calc(69 * var(--px));">A partnership approach that ensures your success at every step.</h2>
-
-          <button type="button" class="hww-cta" style="margin-top:calc(32 * var(--px));width:calc(141 * var(--px));height:calc(47 * var(--px));border-radius:calc(10 * var(--px));font-size:calc(15 * var(--px));">Start a Project</button>
-        </div>
-
-        <p class="hww-para" style="left:calc(150 * var(--px));top:calc(757 * var(--px));width:calc(328 * var(--px));font-size:calc(20 * var(--px));line-height:calc(30 * var(--px));">We work as an extension of your team, from first idea to real-world results.</p>
 
         <!-- Step 1 — Understand -->
         <div class="hww-step-group" data-hww-step="1">
@@ -529,65 +531,28 @@
     </div>
   </section>
 
-  <!-- differentiators -->
-  <section class="section">
-    <div class="container">
+
+  <!-- our impact — Figma 400:2799, built to the node coordinates rather than a
+       derived grid: 37 tiles at their exact x/y inside the 2180x1702 field, on
+       a 1440x987 artboard that scales with the viewport. -->
+  <section class="imp" id="impact">
+    <!-- the heading rides the site's own container and .section-head styles so
+         it lines up with every other section; only the field is on the artboard -->
+    <div class="container imp__head">
       <div class="section-head">
-        <span class="eyebrow">Why ATCON</span>
-        <h2>What our clients keep coming back for.</h2>
-      </div>
-
-      <div class="grid grid-3">
-        <article class="card reveal">
-          <h3>Deep partnerships</h3>
-          <p>Most of our work is with clients we've already delivered for. We're built for the second and third project.</p>
-        </article>
-        <article class="card reveal">
-          <h3>Clarity over complexity</h3>
-          <p>Plain language, visible tradeoffs and no jargon standing in for a decision.</p>
-        </article>
-        <article class="card reveal">
-          <h3>Outcome-led delivery</h3>
-          <p>Scoped against a business number — hours saved, cost removed, revenue unblocked.</p>
-        </article>
-        <article class="card reveal">
-          <h3>Innovation first</h3>
-          <p>We keep pace with what's genuinely useful and skip what's merely fashionable.</p>
-        </article>
-        <article class="card reveal">
-          <h3>Security by design</h3>
-          <p>Access, auditability and data handling built in from the first sprint, not bolted on before launch.</p>
-        </article>
-        <article class="card reveal">
-          <h3>Agile excellence</h3>
-          <p>Short cycles, working demos and a roadmap you can change without renegotiating everything.</p>
-        </article>
+        <span class="eyebrow">Our impact</span>
+        <h2>Our proven performance indicators</h2>
       </div>
     </div>
-  </section>
-
-  <!-- stats -->
-  <section class="section section--dark">
-    <div class="container">
-      <div class="grid grid-4">
-        <div class="stat">
-          <strong data-count="98" data-suffix="%">98%</strong>
-          <span>Client satisfaction &amp; retention</span>
-        </div>
-        <div class="stat">
-          <strong data-count="50" data-suffix="+">50+</strong>
-          <span>Software projects delivered</span>
-        </div>
-        <div class="stat">
-          <strong data-count="25" data-suffix="+">25+</strong>
-          <span>Technology partners</span>
-        </div>
-        <div class="stat">
-          <strong data-count="10" data-suffix="+">10+</strong>
-          <span>Years of expertise</span>
-        </div>
-      </div>
+    <div class="imp__art">
+      <div class="imp__field" data-imp-field aria-hidden="true"></div>
     </div>
+    <ul class="imp__sr">
+      <li>98% client satisfaction and retention</li>
+      <li>50+ software projects co-delivered</li>
+      <li>25+ technology partners in our network</li>
+      <li>10+ years navigating expertise</li>
+    </ul>
   </section>
 
   <!-- case studies: a sticky stack. Every slide pins at the same offset, so the
