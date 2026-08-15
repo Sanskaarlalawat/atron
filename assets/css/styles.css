@@ -3075,3 +3075,13 @@ a.footer-value:hover { color: #cfe0ff; }
   .cta-band { min-height: 0; padding-top: 60px; }
   .cta { padding: 90px 0 20px; }
 }
+
+/* --- laptops (900-1200px) ---------------------------------------------
+   The How We Work stage widens to fill the frame as the viewport narrows, so
+   the left-hand copy — which is pinned to the site gutter, not to the stage —
+   closes on the first plate. Measured at 1024x700 the gap was only 28px.
+   Narrowing the copy column here keeps them apart with room to spare. */
+@media (min-width: 900px) and (max-width: 1200px) {
+  .hww__pin > .hww-copy { width: min(24rem, 33%) !important; }
+  .hww__pin > .hww-para { width: min(17rem, 24%) !important; }
+}
