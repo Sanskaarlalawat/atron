@@ -3001,3 +3001,77 @@ a.footer-value:hover { color: #cfe0ff; }
    are 1px wide, the horizontals span 100%. */
 /* NB: the inline attribute is minified with no spaces — "width:1px" */
 .hww-backdrop__rule[style*="width:1px"] { display: none !important; }
+
+/* ============================================================
+   RESPONSIVE — under 900px the pinned, artboard-based scenes cannot
+   shrink usefully (they are fixed-unit 1440 stages), so each one hands
+   over to a linear version of the same content.
+   ============================================================ */
+@media (max-width: 899px) {
+
+  /* --- How We Work: linear flow instead of the pinned stage --- */
+  .hww__pin > .hww-copy,
+  .hww__pin > .hww-para { display: none; }
+
+  .hww-flow-eyebrow {
+    display: block;
+    font-size: .78rem; font-weight: 700; letter-spacing: .14em;
+    text-transform: uppercase; color: var(--blue);
+  }
+  .hww-headline--flow { color: var(--ink); font-weight: 700; letter-spacing: -.02em; }
+  .hww-flow-lead { margin: 14px 0 0; color: var(--muted); max-width: 42ch; }
+  .hww-flow {
+    list-style: none;
+    margin: 30px 0 0;
+    padding: 0;
+    display: grid;
+    gap: 14px;
+  }
+  .hww-flow-step {
+    position: relative;
+    padding: 20px 20px 20px 22px;
+    border-radius: var(--radius);
+    background: #fff;
+    box-shadow: var(--shadow);
+    /* the accent edge stands in for the connector line the stage draws */
+    border-left: 3px solid var(--blue);
+  }
+  .hww-flow-step__num {
+    display: block; margin-bottom: 6px;
+    font-size: .72rem; font-weight: 700; letter-spacing: .12em;
+    text-transform: uppercase; color: var(--blue);
+  }
+  .hww-flow-step__title { margin: 0 0 6px; font-size: 1.15rem; }
+  .hww-flow-step__body { margin: 0; color: var(--muted); font-size: .95rem; line-height: 1.55; }
+
+  /* --- Our Impact: the isometric field scales to --k 0.30 on a phone,
+         which puts 40px type inside a 99px tile. Swap it for a stat grid. --- */
+  .imp { height: auto; padding-bottom: 64px; }
+  .imp__art { display: none; }
+  .imp__sr { position: static; width: auto; height: auto; margin: 0; clip: auto; white-space: normal; }
+  .imp__head { padding-top: 72px; }
+  .imp__sr {
+    list-style: none;
+    margin: 28px 0 0;
+    padding: 0 24px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    max-width: var(--max);
+    margin-inline: auto;
+  }
+  .imp__sr li {
+    padding: 18px 16px;
+    border-radius: var(--radius);
+    background: #fff;
+    box-shadow: var(--shadow);
+    font-size: .9rem;
+    line-height: 1.4;
+    color: var(--muted);
+  }
+  .imp__sr li b { display: block; font-size: 1.9rem; color: var(--ink); margin-bottom: 4px; }
+
+  /* --- the CTA band is sized for a desktop viewport --- */
+  .cta-band { min-height: 0; padding-top: 60px; }
+  .cta { padding: 90px 0 20px; }
+}
