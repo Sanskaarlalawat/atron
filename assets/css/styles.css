@@ -1612,18 +1612,11 @@ p { margin: 0 0 1rem; }
 
 /* ----- left column ----- */
 
+/* Was a white pill with a shadow and a dark icon disc — the only section label
+   on the site with chrome around it. Stripped back to a plain eyebrow so it
+   matches "OUR IMPACT", "SELECTED WORK" and the rest. */
 .tm-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  padding: 7px 16px 7px 7px;
-  border-radius: 999px;
-  background: #fff;
-  box-shadow:
-    0 0 0 1px rgba(20, 22, 30, .05),
-    0 6px 18px rgba(20, 22, 30, .06);
-  /* was .86rem/600/dark — brought onto the shared eyebrow spec so it reads as
-     this section's label rather than a second style of label */
+  display: inline-block;
   font-size: .78rem;
   font-weight: 700;
   letter-spacing: .14em;
@@ -1631,13 +1624,8 @@ p { margin: 0 0 1rem; }
   color: var(--blue);
   margin-bottom: 26px;
 }
-.tm-badge i {
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
-  background: var(--tm-ink);
-  position: relative;
-}
+.tm-badge i { display: none; }
+
 /* the spark inside the badge */
 .tm-badge i::before {
   content: "";
@@ -3084,4 +3072,12 @@ a.footer-value:hover { color: #cfe0ff; }
 @media (min-width: 900px) and (max-width: 1200px) {
   .hww__pin > .hww-copy { width: min(24rem, 33%) !important; }
   .hww__pin > .hww-para { width: min(17rem, 24%) !important; }
+}
+
+/* .hero is a flex column with align-items:flex-end, so the copy hangs off the
+   BOTTOM of the hero — a top margin only grows the block upward and moves
+   nothing. The bottom padding is the actual lever: trimming it lets the whole
+   copy sit lower, clear of the busiest part of the illustration. */
+@media (min-width: 900px) {
+  .hero { padding-bottom: 40px; }
 }
