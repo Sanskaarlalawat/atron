@@ -19,6 +19,210 @@
     return isNaN(v) ? 88 : v;
   }
 
+  /* --- preloader ---
+     Covers the page until it has finished loading, then lifts.
+
+     The bar tracks real work: every eager image that resolves and the hero
+     video reaching canplaythrough each move it. That alone can sit still for
+     long stretches on a slow connection, so a slow creep fills the gaps — but
+     it is capped below 100 so the bar can never claim to be finished while the
+     page is not. Only `load` takes it to 100.
+
+     Three things guarantee nobody gets stuck here, which matters more than any
+     of the rest: `load` fires even when assets fail, image handlers count
+     errors as done, and a hard timeout lifts the cover regardless. The cover
+     failing open is a slightly early reveal; failing closed is a dead site. */
+  var preloader = document.querySelector("[data-preloader]");
+
+  if (preloader) {
+    var plBar = preloader.querySelector("[data-pl-bar]");
+    var plPct = preloader.querySelector("[data-pl-pct]");
+    var plShown = 0;
+    var plDone = false;
+
+    var plSet = function (pct) {
+      // monotonic: a progress bar that goes backwards reads as a fault
+      pct = Math.max(plShown, Math.min(100, pct));
+      plShown = pct;
+      if (plBar) plBar.style.width = pct + "%";
+      if (plPct) plPct.textContent = Math.round(pct);
+    };
+
+    /* Hand the loader's wordmark to the header's, then clear the cover.
+       Measured rather than hard-coded: the header seat moves with the viewport
+       and the capsule's own layout, so the only way the mark lands in it at
+       every width is to read both rects at the moment of the handoff. */
+    /* Hand the loader's wordmark to the header's.
+
+       The mark is lifted out of the cover first. The cover clears itself with
+       clip-path, and clip-path clips descendants — with the mark still inside
+       it, the wipe sliced the mark away mid-flight and it never visibly
+       arrived. Flying it from a fixed layer above the cover is what lets it
+       cross the join intact.
+
+       Positions are measured, not hard-coded: the header seat moves with the
+       viewport and the capsule's own layout. */
+    var plFly = null;
+
+    var plHandoff = function () {
+      var from = preloader.querySelector(".pl__mark");
+      var to = document.querySelector(".site-header .logo-mark");
+      if (!from || !to) return;
+
+      /* Measure the seat where it will finally REST, not where it happens to be
+         right now. The header is mid-entrance at this moment — it carries an
+         opacity and a translate — so reading it as-is aims the flight at a spot
+         the header is about to move away from, and the mark lands beside the
+         logo instead of on it. Neutralise the entrance for the measurement
+         only, then put it straight back. */
+      var hdr = document.querySelector(".site-header");
+      var prevTransition = "", prevTransform = "";
+      if (hdr) {
+        prevTransition = hdr.style.transition;
+        prevTransform = hdr.style.transform;
+        hdr.style.transition = "none";
+        hdr.style.transform = "none";
+      }
+
+      var a = from.getBoundingClientRect();
+      var b = to.getBoundingClientRect();
+
+      if (hdr) {
+        hdr.style.transform = prevTransform;
+        hdr.style.transition = prevTransition;
+      }
+
+      if (!a.width || !b.width) return;
+
+      // hold the space so the bar and read-out under it do not jump up when
+      // the mark leaves the cover's flow
+      var spacer = document.createElement("span");
+      spacer.style.display = "block";
+      spacer.style.width = a.width + "px";
+      spacer.style.height = a.height + "px";
+      from.parentNode.insertBefore(spacer, from);
+
+      plFly = document.createElement("div");
+      plFly.className = "pl-fly";
+      plFly.style.left = a.left + "px";
+      plFly.style.top = a.top + "px";
+      plFly.style.width = a.width + "px";
+      plFly.style.height = a.height + "px";
+      // the same node, moved — not a copy, so it is literally the mark the
+      // loader was showing that arrives in the header
+      plFly.appendChild(from);
+      document.body.appendChild(plFly);
+
+      // force the browser to accept the new position before transitioning
+      void plFly.offsetWidth;
+
+      from.style.setProperty("--pl-dx", (b.left + b.width / 2 - (a.left + a.width / 2)) + "px");
+      from.style.setProperty("--pl-dy", (b.top + b.height / 2 - (a.top + a.height / 2)) + "px");
+      from.style.setProperty("--pl-s", b.width / a.width);
+    };
+
+    var plFinish = function () {
+      if (plDone) return;
+      plDone = true;
+      plSet(100);
+
+      var root = document.documentElement;
+      // hold the hero and header in their pre-entrance state before uncovering
+      root.classList.add("is-revealing");
+
+      /* Let the bar land on 100 and be read, then send the mark to its seat —
+         but only once webfonts have settled. A font swapping in after the
+         measurement reflows the header and moves the seat out from under a
+         flight already in progress. */
+      var plLaunch = function () {
+        preloader.classList.add("is-handoff");
+        plHandoff();
+        if (plFly) plFly.classList.add("is-flying");
+      };
+
+      setTimeout(function () {
+        if (document.fonts && document.fonts.ready) {
+          document.fonts.ready.then(plLaunch).catch(plLaunch);
+        } else {
+          plLaunch();
+        }
+      }, 300);
+
+      // the cover clears while the mark is still travelling, so the site is
+      // revealed underneath a moving element rather than after it stops
+      setTimeout(function () {
+        preloader.classList.add("is-done");
+        void preloader.offsetWidth;
+        preloader.classList.add("is-clearing");
+        root.classList.remove("is-loading");
+        root.classList.add("is-revealed");
+        // release the held text reveals so they play in view, not behind the cover
+        document.dispatchEvent(new CustomEvent("atcon:revealed"));
+      }, 980);
+
+      /* The swap. The flight starts at 300ms and runs 1550ms, so it lands at
+         1850ms — that is the moment the loader's mark is sitting exactly on
+         the header seat. Reveal the real logo and drop the loader in the same
+         tick, so there is never a frame with two marks or with none. Both
+         numbers are here rather than split across files for that reason: they
+         have to stay in step with the 1.55s transition in the CSS. */
+      setTimeout(function () {
+        root.classList.add("is-logo-landed");
+        if (plFly && plFly.parentNode) plFly.parentNode.removeChild(plFly);
+        if (preloader.parentNode) preloader.parentNode.removeChild(preloader);
+        root.classList.remove("is-revealing");
+      }, 1850);
+    };
+
+    // --- real signals
+    var plImgs = [].slice.call(document.images).filter(function (img) {
+      return img.loading !== "lazy";
+    });
+    var plVideo = document.querySelector("[data-hero-video]");
+    var plTotal = plImgs.length + (plVideo ? 1 : 0);
+    var plReady = 0;
+
+    var plTick = function () {
+      plReady++;
+      if (plTotal) plSet((plReady / plTotal) * 88);
+    };
+
+    plImgs.forEach(function (img) {
+      if (img.complete) { plTick(); return; }
+      img.addEventListener("load", plTick, { once: true });
+      // an asset that 404s still counts — the point is to stop waiting on it
+      img.addEventListener("error", plTick, { once: true });
+    });
+
+    if (plVideo) {
+      if (plVideo.readyState >= 3) plTick();
+      else {
+        plVideo.addEventListener("canplaythrough", plTick, { once: true });
+        plVideo.addEventListener("error", plTick, { once: true });
+      }
+    }
+
+    // --- creep, so the bar never looks frozen while a big asset streams
+    var plCreep = setInterval(function () {
+      if (plDone) return clearInterval(plCreep);
+      if (plShown < 92) plSet(plShown + (92 - plShown) * 0.045);
+    }, 180);
+
+    if (document.readyState === "complete") plFinish();
+    else window.addEventListener("load", plFinish, { once: true });
+
+    // last resort: never hold the page hostage to a stalled request
+    setTimeout(plFinish, 12000);
+
+    /* Belt and braces on the swap specifically. The logo is hidden by CSS and
+       only ever revealed by .is-logo-landed, so if the sequence above were
+       interrupted the header would be left with no logo at all. This guarantees
+       it comes back regardless of how the reveal went. */
+    setTimeout(function () {
+      document.documentElement.classList.add("is-logo-landed");
+    }, 14000);
+  }
+
   /* --- mobile navigation --- */
   var toggle = document.querySelector(".nav-toggle");
   var nav = document.querySelector(".nav");
@@ -787,11 +991,24 @@
      problem and CTA headings, the pinned How We Work headline) — stacking two
      opacity animations on one element makes both look broken. */
   if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    /* .hero-copy h1 belongs here too. It was the one heading on the site left
+       out of the word cascade, so while the copy beneath it eased in the
+       headline simply appeared — which reads as it having no entrance rather
+       than a fast one. */
+    /* Every heading on the site, including the ones that do not use
+       .section-head: the hero, and how-we-work's own markup. Both of
+       how-we-work's variants are listed — the pinned scene and the flow
+       fallback under 900px — because only one of them is in the DOM's flow at
+       a given width and missing the other leaves that breakpoint static. */
     var txHeads = document.querySelectorAll(
-      ".section-head .eyebrow, .section-head h2, .seq__title, .tm-title, .footer-head");
+      ".hero-copy h1, .section-head .eyebrow, .section-head h2, .seq__title," +
+      " .tm-title, .footer-head," +
+      " .hww-badge__label, .hww-headline," +
+      " .hww-flow-eyebrow, .hww-headline--flow");
     // the supporting copy that sits with those headings
     var txBlocks = document.querySelectorAll(
-      ".hero-copy .lead, .hero-copy .hero-actions, .tm-badge, .tm-list, .section-head p");
+      ".hero-copy .lead, .hero-copy .hero-actions, .tm-badge, .tm-list," +
+      " .section-head p, .hww-para, .hww-flow-lead");
 
     // splits text nodes only, so <br> and any inline markup survive intact
     var splitWords = function (el) {
@@ -822,11 +1039,29 @@
       el.classList.add("tx", "is-split");
     };
 
+    /* Anything above the fold is already intersecting when this runs, so
+       without a gate the hero's copy plays its whole reveal behind the
+       preloader and is finished before the cover lifts — which reads as the
+       hero having no entrance at all. Hold those until the site is actually
+       on screen, then release them together. */
+    var txPending = [];
+    var txGateOpen = !document.documentElement.classList.contains("is-loading");
+
+    var txRelease = function () {
+      if (txGateOpen) return;
+      txGateOpen = true;
+      txPending.splice(0).forEach(function (el) { el.classList.add("is-in"); });
+    };
+    document.addEventListener("atcon:revealed", txRelease);
+    // if the preloader is not on this page, nothing will fire the event
+    if (!document.querySelector("[data-preloader]")) txRelease();
+
     var txObs = new IntersectionObserver(function (entries, obs) {
       entries.forEach(function (e) {
         if (!e.isIntersecting) return;
-        e.target.classList.add("is-in");
         obs.unobserve(e.target);
+        if (txGateOpen) e.target.classList.add("is-in");
+        else txPending.push(e.target);
       });
     }, { threshold: 0.25, rootMargin: "0px 0px -50px" });
 
@@ -929,13 +1164,36 @@
       impSec.classList.add("is-risen");
     } else {
       impSec.classList.add("is-armed");
-      new IntersectionObserver(function (entries, obs) {
-        entries.forEach(function (e) {
-          if (!e.isIntersecting) return;
-          impSec.classList.add("is-risen");
-          obs.disconnect();
-        });
-      }, { threshold: 0, rootMargin: "0px 0px -45% 0px" }).observe(impSec);
+
+      /* Hold the blocks flat until the reader is 65% of the way into the
+         section. Progress is how much of the section has climbed past the fold
+         measured against its own height, so it means the same thing whatever
+         the section ends up measuring: 0 as the top touches the bottom of the
+         screen, 1 once a full section-height has passed that line. An
+         IntersectionObserver can't express this — its rootMargin is a fraction
+         of the VIEWPORT, not of the element — so this is scrubbed by hand and
+         unbinds the moment it fires. */
+      var IMP_START = 0.65;
+      var impQ = false;
+
+      var testImp = function () {
+        var r = impSec.getBoundingClientRect();
+        if (!r.height) return;                       // laid out yet?
+        if ((window.innerHeight - r.top) / r.height < IMP_START) return;
+        impSec.classList.add("is-risen");
+        window.removeEventListener("scroll", onImp);
+        window.removeEventListener("resize", onImp);
+      };
+
+      var onImp = function () {
+        if (impQ) return;
+        impQ = true;
+        requestAnimationFrame(function () { impQ = false; testImp(); });
+      };
+
+      window.addEventListener("scroll", onImp, { passive: true });
+      window.addEventListener("resize", onImp);
+      testImp();                                     // already deep in view?
     }
   }
 

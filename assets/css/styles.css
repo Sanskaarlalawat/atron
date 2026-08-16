@@ -3081,3 +3081,206 @@ a.footer-value:hover { color: #cfe0ff; }
 @media (min-width: 900px) {
   .hero { padding-bottom: 40px; }
 }
+
+/* ---------- preloader ----------
+   Holds the page behind a full-bleed cover until everything has loaded, then
+   lifts. Built from the site's own tokens — the hero's background, the brand
+   mark, the blue — so it reads as the first frame of the site rather than a
+   generic spinner bolted on the front.
+
+   It only exists while <html> carries .is-loading, which the inline script in
+   the head adds. With JavaScript off that never happens and none of this
+   applies, which is the safe direction to fail in. */
+
+.pl {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: grid;
+  place-items: center;
+  background: var(--hero-bg);
+  /* not shown unless the page says it is loading */
+  visibility: hidden;
+  opacity: 0;
+}
+.is-loading .pl { visibility: visible; opacity: 1; }
+
+/* the page underneath is held still while the cover is up, so a stray scroll
+   during load does not leave the user part-way down a page they cannot see */
+.is-loading body { overflow: hidden; }
+
+.pl__inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 26px;
+  padding: 0 24px;
+}
+
+/* the site's own mark, masked exactly as the header does it */
+.pl__mark {
+  display: block;
+  width: 150px;
+  height: 26px;
+  background: var(--ink);
+  -webkit-mask: url("../img/atcon-logo.svg") no-repeat center / contain;
+  mask: url("../img/atcon-logo.svg") no-repeat center / contain;
+  animation: pl-breathe 1.9s ease-in-out infinite;
+}
+
+.pl__track {
+  position: relative;
+  width: min(212px, 56vw);
+  height: 2px;
+  border-radius: 2px;
+  background: rgba(15, 23, 42, .1);
+  overflow: hidden;
+}
+.pl__bar {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 0;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--blue), #7c3aed);
+  /* main.js only ever raises this, so the bar cannot run backwards */
+  transition: width .38s cubic-bezier(.22, 1, .36, 1);
+}
+
+.pl__pct {
+  margin: 0;
+  font-size: .72rem;
+  font-weight: 600;
+  letter-spacing: .16em;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+@keyframes pl-breathe {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: .42; }
+}
+
+/* The lift: the cover fades and rises just enough to feel like it is getting
+   out of the way, and stops taking pointer events immediately so the site is
+   interactive the moment it starts leaving. */
+.pl.is-done {
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(-12px);
+  transition: opacity .55s ease, transform .55s cubic-bezier(.22, 1, .36, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pl__mark { animation: none; }
+  .pl__bar { transition: none; }
+  .pl.is-done { transition: none; transform: none; }
+}
+
+/* ----- loader → site handoff -----
+   The cover does not simply fade. Its wordmark travels to the seat the header
+   logo occupies, so the one element the two screens share carries the eye
+   across the join, and the hero copy rises in underneath as the cover clears.
+   Together they read as one continuous arrival rather than a curtain drop. */
+
+/* The layer the mark flies on. It sits above the cover and outside it, because
+   the cover clears itself with clip-path and clip-path clips its descendants —
+   a mark left inside gets sliced away mid-flight instead of arriving. */
+.pl-fly {
+  position: fixed;
+  z-index: 10000;
+  pointer-events: none;
+}
+.pl-fly .pl__mark {
+  width: 100%;
+  height: 100%;
+  animation: none;
+}
+.pl-fly.is-flying .pl__mark {
+  transition: transform 1.55s cubic-bezier(.5, 0, .18, 1);
+}
+
+/* the mark is measured and moved by main.js, which is why the transform is a
+   variable rather than a fixed value — the header seat moves with the viewport */
+.pl__mark {
+  transform: translate3d(var(--pl-dx, 0px), var(--pl-dy, 0px), 0) scale(var(--pl-s, 1));
+  transform-origin: 50% 50%;
+}
+.pl.is-handoff .pl__mark {
+  animation: none;
+  /* A long, near-symmetric ease. The previous curve (.66, 0, .2, 1) put most
+     of the travel in the first third, which is what made the mark look like it
+     snapped to the header rather than settled into it. */
+  transition: transform 1.55s cubic-bezier(.5, 0, .18, 1);
+}
+/* the read-out has done its job by then and would only trail behind the mark */
+.pl.is-handoff .pl__track,
+.pl.is-handoff .pl__pct {
+  opacity: 0;
+  transition: opacity .34s ease;
+}
+
+/* The cover clears upward from its own bottom edge rather than fading in
+   place, so the site is uncovered progressively instead of dissolving through
+   a translucent grey midpoint. */
+.pl.is-done {
+  opacity: 1;
+  transform: none;
+  clip-path: inset(0 0 0 0);
+  transition: clip-path 1s cubic-bezier(.72, 0, .22, 1);
+}
+.pl.is-clearing { clip-path: inset(0 0 100% 0); }
+
+/* The hero copy is deliberately NOT animated here. It already belongs to the
+   site's own .tx / .tx-b reveal system, and driving it from two places meant
+   the headline ran a word cascade and an opacity fade at the same time. The
+   only thing that was actually wrong is that the reveal fired behind the
+   cover — main.js now holds it until the cover lifts. */
+
+/* The capsule drops in, and its nav items follow — but the header's own logo
+   is deliberately excluded from that. The loader's mark is carrying the logo
+   in; if the real one faded up at the same time you would see two marks doing
+   different things in the same seat. It is swapped in at the single instant
+   the flight lands, which is what makes the loader look like it delivered it. */
+.is-revealing .site-header { opacity: 0; transform: translateY(-14px); }
+.is-revealed .site-header {
+  opacity: 1;
+  transform: none;
+  transition: opacity .62s ease .5s, transform .62s cubic-bezier(.22, 1, .36, 1) .5s;
+}
+
+/* held back until the mark arrives — see .is-logo-landed below */
+.is-revealing .site-header .logo,
+.is-revealed:not(.is-logo-landed) .site-header .logo { opacity: 0; }
+/* no transition: this is a swap with the loader's mark, not a fade of its own.
+   Anything longer than a frame here shows both marks at once. */
+.is-logo-landed .site-header .logo { opacity: 1; }
+
+/* the nav arrives on its own stagger, after the capsule */
+.is-revealing .site-header .nav > *,
+.is-revealing .site-header .nav-toggle { opacity: 0; transform: translateY(-6px); }
+.is-revealed .site-header .nav > *,
+.is-revealed .site-header .nav-toggle {
+  opacity: 1;
+  transform: none;
+  transition: opacity .44s ease var(--nd, .62s),
+    transform .44s cubic-bezier(.22, 1, .36, 1) var(--nd, .62s);
+}
+.site-header .nav > *:nth-child(1) { --nd: .62s; }
+.site-header .nav > *:nth-child(2) { --nd: .69s; }
+.site-header .nav > *:nth-child(3) { --nd: .76s; }
+.site-header .nav > *:nth-child(4) { --nd: .83s; }
+.site-header .nav > *:nth-child(5) { --nd: .9s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .pl.is-handoff .pl__mark,
+  .pl-fly.is-flying .pl__mark { transition: none; }
+  .pl.is-done { transition: opacity .2s ease; }
+  .pl.is-clearing { clip-path: none; opacity: 0; }
+  .is-revealing .site-header,
+  .is-revealing .site-header .logo,
+  .is-revealing .site-header .nav > *,
+  .is-revealing .site-header .nav-toggle { opacity: 1; transform: none; }
+  .is-revealed .site-header,
+  .is-revealed .site-header .nav > *,
+  .is-revealed .site-header .nav-toggle { transition: none; }
+}

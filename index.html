@@ -14,8 +14,29 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Geist+Mono:wght@500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/css/how-we-work.css?v=1786802215">
 <link rel="stylesheet" href="assets/css/what-we-do.css?v=1786802215">
+<script>
+  /* Arm the loader before first paint, so the page never flashes through
+     unstyled on its way to being covered. Deliberately inline and here rather
+     than in main.js — a deferred script runs too late to prevent the flash.
+
+     The class is what makes the overlay visible at all: with JavaScript off it
+     is never added, the overlay stays hidden, and the site is simply usable.
+     A loader that hides a working page when its own script fails is worse than
+     no loader, so the failure direction is always "reveal". */
+  document.documentElement.classList.add("is-loading");
+</script>
 </head>
 <body>
+
+<!-- Preloader. Removed by main.js on window.load, with a hard timeout behind
+     it so a stalled asset can never trap anyone on this screen. -->
+<div class="pl" data-preloader role="status" aria-live="polite" aria-label="Loading">
+  <div class="pl__inner">
+    <span class="pl__mark"></span>
+    <div class="pl__track"><span class="pl__bar" data-pl-bar></span></div>
+    <p class="pl__pct"><span data-pl-pct>0</span>%</p>
+  </div>
+</div>
 
 <header class="site-header">
   <div class="container">
